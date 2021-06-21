@@ -293,6 +293,11 @@ def import_table( in_file_name, in_table_name, in_line_count ):
 ##-----------------------------------------------------------
 ##  make it so
 
+## 21jun21
+##  seperate the creation of the tables 
+##  make a single row+INSERT into an atomic action
+##  add control flow toiterate across the chain to the tip
+
 setup()
 
 do_import_bbits()
