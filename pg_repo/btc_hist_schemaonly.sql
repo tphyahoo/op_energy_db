@@ -22,7 +22,6 @@ SET row_security = off;
 
 CREATE EXTENSION IF NOT EXISTS plpython3u WITH SCHEMA pg_catalog;
 
-
 --
 -- Name: EXTENSION plpython3u; Type: COMMENT; Schema: -; Owner: 
 --
@@ -98,14 +97,14 @@ ALTER FUNCTION public.calculate_energy_price_print(blka_height integer, blka_med
 CREATE FUNCTION public.cbits_to_hexstr(text) RETURNS text
     LANGUAGE plpython3u
     AS $$
-cbits_hex = int( args[0], 16)
-reg_difficulty  = cbits_hex & 0x007FFFFF
-reg_exp_enc = (cbits_hex & 0xFF000000) >> 24
+  cbits_hex = int( args[0], 16)
+  reg_difficulty  = cbits_hex & 0x007FFFFF
+  reg_exp_enc = (cbits_hex & 0xFF000000) >> 24
 
-exp_const = 1 * 2** (8*(reg_exp_enc-3))
-exp_var = reg_difficulty * 2** (8*(reg_exp_enc-3))
-bCnt = (exp_var.bit_length() +7)/8
-return hex(exp_var)
+  exp_const = 1 * 2** (8*(reg_exp_enc-3))
+  exp_var = reg_difficulty * 2** (8*(reg_exp_enc-3))
+  bCnt = (exp_var.bit_length() +7)/8
+  return hex(exp_var)
 $$;
 
 
@@ -116,11 +115,11 @@ ALTER FUNCTION public.cbits_to_hexstr(text) OWNER TO opdev;
 --
 
 CREATE FUNCTION public.uintstr_to_hexstr(text) RETURNS text
- AS
-'tStr = args[0]
-tStr = tStr.strip( "\"")
-tStr = tStr.lstrip("0")
-return "0x"+tStr
+ AS '
+  tStr = args[0]
+  tStr = tStr.strip( "\"")
+  tStr = tStr.lstrip("0")
+  return "0x"+tStr
 ' LANGUAGE plpython3u;
 
 ALTER FUNCTION public.uintstr_to_hexstr(text) OWNER TO opdev;
@@ -130,9 +129,9 @@ ALTER FUNCTION public.uintstr_to_hexstr(text) OWNER TO opdev;
 --
 
 CREATE FUNCTION public.fix_quoted_numbers(text) RETURNS text
- AS
-'tStr = args[0]
-return "0x"+tStr.strip("\"")'
+ AS '
+  tStr = args[0]
+  return "0x"+tStr.strip("\"")'
 LANGUAGE plpython3u;
 
 ALTER FUNCTION public.fix_quoted_numbers(text) OWNER TO opdev;
@@ -145,7 +144,7 @@ ALTER FUNCTION public.fix_quoted_numbers(text) OWNER TO opdev;
 CREATE FUNCTION public.hexstr_to_bigint(text) RETURNS bigint
     LANGUAGE plpython3u
     AS $$
-return int( args[0], base=16)
+  return int( args[0], base=16)
 $$;
 
 
@@ -192,8 +191,8 @@ ALTER FUNCTION public.hexstr_to_cbits(text) OWNER TO opdev;
 CREATE FUNCTION public.int_to_hexstr(integer) RETURNS text
     LANGUAGE plpython3u
     AS $$
-tBInt = args[0]
-return  hex(tBInt)
+  tBInt = args[0]
+  return  hex(tBInt)
 $$;
 
 
