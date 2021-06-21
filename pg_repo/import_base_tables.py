@@ -237,26 +237,6 @@ def do_import_bbits():
   return
 
 
-##-------------------------------------------------------------
-def do_make_hashdata_table():
-    ## TODO 
-
-
-    return
-
-    t_SQL = '''
-     -- COPY
-    '''
-
-    try:
-        gcurs.execute( t_SQL )
-    except Exception, E:
-      print str(E)
-      exit(1)
-    gconn.commit()
-
-    return
-
 #---------------------------------------------------------------
 def import_table( in_file_name, in_table_name, in_line_count ):
 
@@ -294,7 +274,7 @@ def import_table( in_file_name, in_table_name, in_line_count ):
 ##  make it so
 
 ## 21jun21
-##  seperate the creation of the tables 
+##  seperate the creation of the tables
 ##  make a single row+INSERT into an atomic action
 ##  add control flow toiterate across the chain to the tip
 
@@ -302,7 +282,6 @@ setup()
 
 do_import_bbits()
 do_import_bstats()
-do_make_hashdata_table()
 
 #for an_import in g_all_imports:
 #    import_table( an_import[0], an_import[1], an_import[2] )
