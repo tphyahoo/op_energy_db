@@ -1,0 +1,58 @@
+--  calculate_energy_price    11jun21  -dbb
+--  calcops_28   12apr21  -dbb
+--  -----------------------------------------
+--  calculate OP_ENERGY values in-database with PostgreSQL and pl/Python3
+--
+--  working OP_ENERGY takes the following inputs from two blocks, return one large integer
+--
+--      blkheight, median_time, chain_reward, chainwork_hex
+--
+-- blkA_height integer, blkA_median_time bigint, blkA_chain_reward bigint, blkA_chainwork_hex text,
+-- blkB_height integer, blkB_median_time bigint, blkB_chain_reward bigint, blkB_chainwork_hex text,
+
+-- example with table data_chain
+SELECT calculate_energy_price( a.blkheight, a.median_time, a.chain_reward, a.chainwork_hex,
+                   b.blkheight, b.median_time, b.chain_reward, b.chainwork_hex)
+FROM data_chain as a, data_chain as b  WHERE
+  a.blkheight > 300000 AND a.blkheight % 2016 = 0  AND  a.blkheight < 399000 AND
+  b.blkheight = (a.blkheight+ 2016)  AND b.median_time <> a.median_time;
+
+--
+CREATE or REPLACE FUNCTION calculate_energy_price (
+ blka_height integer, blka_median_time bigint, blka_chain_reward bigint, blka_chainwork_hex text,
+ blkb_height integer, blkb_median_time bigint, blkb_chain_reward bigint, blkb_chainwork_hex text
+) RETURNS text
+as $$
+  ##  assume blkB height > blkA height
+  hash_cnt      = int( blkb_chainwork_hex,base=16) - int( blka_chainwork_hex,base=16)
+  expected_secs = 600 * ( blkb_height - blka_height )
+  actual_secs   = blkb_median_time - blka_median_time
+  sats          = blkb_chain_reward - blka_chain_reward
+
+  price_prime,elem  = divmod( (hash_cnt * expected_secs),(actual_secs*sats) )
+  return  str(price_prime)
+
+$$ language plpython3u IMMUTABLE; 
+
+--
+CREATE or REPLACE FUNCTION calculate_energy_price_print (
+ blka_height integer, blka_median_time bigint, blka_chain_reward bigint, blka_chainwork_hex text,
+ blkb_height integer, blkb_median_time bigint, blkb_chain_reward bigint, blkb_chainwork_hex text
+) RETURNS text
+as $$
+  ##  note that postgres casts identifiers to lower-case silently
+  res_str = ''
+  res_str = 'blkA_height:' + str(blka_height) 
+  res_str = res_str + '; blkA_median_time:' + str(blka_median_time)
+  res_str = res_str + '; blkA_chain_reward:' + str(blka_chain_reward)
+  res_str = res_str + '; blkA_chainwork_hex: ' + blka_chainwork_hex
+  res_str = res_str + '; blkB_height:' + str(blkb_height) 
+  res_str = res_str + '; blkB_median_time:' + str(blkb_median_time)
+  res_str = res_str + '; blkB_chain_reward:' + str(blkb_chain_reward)
+  res_str = res_str + '; blkB_chainwork_hex: ' + blkb_chainwork_hex
+  return  res_str
+$$ language plpython3u IMMUTABLE;
+
+--
+
+
