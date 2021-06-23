@@ -32,7 +32,7 @@ try:
   _pguser     = os.getenv('PGUSER')
   _pgpassword = os.getenv('PGPASSWORD')
 
-  _test_mode = False    ## TODO get from ENV
+  _test_mode = True    ## TODO get from ENV
 except:
   print( sys.argv[0] )
   print( ' ENV not complete' )
@@ -197,7 +197,12 @@ def do_import_bbits():
 
   t_SQL = "insert into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
 
-  end_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
+  comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
+  try:
+    gcurs.execute( comment_SQL )
+  except Exception, E:
+    print(str(E))
+  gconn.commit()
 
   ##----------------
   try:
@@ -236,12 +241,6 @@ def do_import_bbits():
 
   gconn.commit()
 
-  ##--------------------------
-  try:
-    gcurs.execute( end_SQL )
-  except Exception, E:
-    print(str(E))
-  gconn.commit()
 
   return
 
@@ -268,7 +267,6 @@ do_make_datachain()
 
 #for an_import in g_all_imports:
 #    import_table( an_import[0], an_import[1], an_import[2] )
-
 
 #----
 # END
