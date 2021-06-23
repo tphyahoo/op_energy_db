@@ -6,12 +6,13 @@
 #  @author: thartman, dbb
 #
 
-## invoke as linux role  opdev
-##  tpath/sw_op_energy/pg_repo$ bash import_from_blockchain.sh
-## or from admin account as  opdev
-##  tpath/sw_op_energy/pg_repo$ sudo -H -u opdev bash import_from_blockchain.sh
+##  Prerequisites:  src repo,  data dir,  postgres role;
 ##
-## ASSUMES: src repo, data dir, postgres role;  all preset
+## invoke this script as linux role  opdev
+##  tpath/sw_op_energy/pg_repo$  bash import_from_blockchain.sh
+## or from admin account as  opdev
+##  tpath/sw_op_energy/pg_repo$  sudo -H -u opdev bash import_from_blockchain.sh
+##
 ##-----------------------------------------------------------------------------
 
 ##  set VERBOSE flags, and exit on any error
@@ -37,7 +38,6 @@ md5sum -c $SRC_MD5SUM
 ## openssl generated file
 ## openssl dgst -hex -sha256 btcdata_1600585200.tgz
 ##   >  btcdata_1600585200.tgz.sha256
-
 
 ## cd work dir with data files
 export DST_DDIR=/tmp/btcdata_extract
