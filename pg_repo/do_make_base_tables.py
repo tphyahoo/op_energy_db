@@ -195,11 +195,9 @@ def do_import_bbits():
   );
   '''
 
-  t_SQL = "insert into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
-  comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
-
   ##----------------
   try:
+    comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
     gcurs.execute( init_SQL )
     gcurs.execute( comment_SQL )
     gconn.commit()
@@ -225,6 +223,7 @@ def do_import_bbits():
     ln4_chainwork = rdF.readline().strip()
 
     #print ln4
+    t_SQL = "insert into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
     gcurs.execute( t_SQL,
       (ln0_height, ln1_hash, ln2_bits, ln3_difficulty, ln4_chainwork))
     if (  int(ln0_height) % 1000 == 0):
