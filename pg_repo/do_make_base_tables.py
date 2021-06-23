@@ -196,24 +196,15 @@ def do_import_bbits():
   '''
 
   t_SQL = "insert into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
+  comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
 
   ##----------------
   try:
     gcurs.execute( init_SQL )
-    gconn.commit()
-  except Exception, E:
-    print(str(E))
-
-
-  ##--------------------
-  comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
-
-  try:
     gcurs.execute( comment_SQL )
     gconn.commit()
   except Exception, E:
     print(str(E))
-
 
   ##---------------------------------------------
   try:
