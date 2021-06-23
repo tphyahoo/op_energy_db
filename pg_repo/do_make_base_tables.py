@@ -251,9 +251,13 @@ def do_import_bbits():
 
 setup()
 do_import_bbits()
-#do_import_bstats()
 
-#do_make_datachain()
+if _test_mode:
+  exit(0)
+
+do_import_bstats()
+
+do_make_datachain()
 
 
 ## 21jun21
