@@ -210,9 +210,9 @@ def do_import_bbits():
 
   try:
     gcurs.execute( comment_SQL )
+    gconn.commit()
   except Exception, E:
     print(str(E))
-  gconn.commit()
 
 
   ##---------------------------------------------
