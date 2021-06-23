@@ -72,6 +72,28 @@ def setup():
         print str(E)
         exit(1)
 
+    ## see  bitcoin-cli getblockstats $HEIGHT
+    ## height, blockhash, bits, difficulty, chainwork
+    init_ibr_SQL = '''
+    DROP table if exists in_bits_raw cascade;
+    CREATE TABLE public.in_bits_raw (
+      height_str text PRIMARY KEY,
+      hash_str text,
+      cbits_str text,
+      difficulty_str text,
+      chainwork_str text
+    );
+    '''
+
+    try:
+      comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
+      gcurs.execute( init_ibr_SQL )
+      gcurs.execute( comment_SQL )
+      gconn.commit()
+    except Exception, E:
+      print(str(E))
+
+
 ##========================
 def do_make_datachain():
 
@@ -182,27 +204,7 @@ def do_import_bbits():
   global _test_mode
   global gcurs, gconn
 
-  ## see  bitcoin-cli getblockstats $HEIGHT
-  ## height, blockhash, bits, difficulty, chainwork
-  init_SQL = '''
-  DROP table if exists in_bits_raw cascade;
-  CREATE TABLE public.in_bits_raw (
-      height_str text PRIMARY KEY,
-      hash_str text,
-      cbits_str text,
-      difficulty_str text,
-      chainwork_str text
-  );
-  '''
-
   ##----------------
-  try:
-    comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
-    gcurs.execute( init_SQL )
-    gcurs.execute( comment_SQL )
-    gconn.commit()
-  except Exception, E:
-    print(str(E))
 
   ##---------------------------------------------
   try:
