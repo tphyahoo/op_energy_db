@@ -31,6 +31,8 @@ try:
   _pgport     = os.getenv('PGPORT')
   _pguser     = os.getenv('PGUSER')
   _pgpassword = os.getenv('PGPASSWORD')
+
+  _test_mode =  False    ## TODO get from ENV
 except:
   print( sys.argv[0] )
   print( ' ENV not complete' )
@@ -69,7 +71,6 @@ def setup():
       except Exception, E:
         print str(E)
         exit(1)
-
 
 ##========================
 def do_make_datachain():
@@ -113,7 +114,10 @@ def do_make_datachain():
 #  read and store a text datafile in custom format
 #   rely on table definition in the template; may change
 def do_import_bstats():
+
+  global _test_mode
   global gcurs, gconn
+
   t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
 
   init_SQL = '''
@@ -175,6 +179,7 @@ def do_import_bstats():
 #  read and store a text datafile in custom format
 #   rely on table definition in the template; may change
 def do_import_bbits():
+  global _test_mode
   global gcurs, gconn
 
   ## see  bitcoin-cli getblockstats $HEIGHT
@@ -225,6 +230,10 @@ def do_import_bbits():
     if (  int(ln0_height) % 1000 == 0):
       gconn.commit()
 
+    #if _test_mode:
+    #  break
+
+
   gconn.commit()
 
   ##--------------------------
@@ -240,20 +249,24 @@ def do_import_bbits():
 ##-----------------------------------------------------------
 ##  make it so
 
+if _test_mode:
+  exit(0)
+
+setup()
+do_import_bbits()
+do_import_bstats()
+
+
 ## 21jun21
 ##  seperate the creation of the tables
 ##  make a single row+INSERT into an atomic action
 ##  add control flow toiterate across the chain to the tip
 
-setup()
-
-do_import_bbits()
-do_import_bstats()
 
 #for an_import in g_all_imports:
 #    import_table( an_import[0], an_import[1], an_import[2] )
 
-do_make_datachain()
+#do_make_datachain()
 
 #----
 # END
