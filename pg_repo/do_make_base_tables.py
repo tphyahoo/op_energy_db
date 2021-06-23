@@ -237,39 +237,6 @@ def do_import_bbits():
   return
 
 
-#---------------------------------------------------------------
-def import_table( in_file_name, in_table_name, in_line_count ):
-
-    try:
-      rdF = open( in_file_name, 'r' )
-    except Exception, E:
-      print str(E)
-      exit(1)
-
-    return 0   ## DEBUG
-
-    while True:
-        ln0 = rdF.readline()
-        if (cmp( ln0, '') == 0):
-            break
-
-        ln0 = ln0.strip()
-        cnt=in_line_count
-        ln1 = rdF.readline().strip()
-        cnt = cnt - 1
-        if (cnt> 0):
-            ln2 = rdF.readline().strip()
-        ln3 = rdF.readline().strip()
-        ln4 = rdF.readline().strip()
-
-        #print ln4
-        gcurs.execute( tSQL, (ln0, ln1, ln2, ln3, ln4))
-        if (  int(ln0) % 128 == 0):
-            gconn.commit()
-
-    print "Done"
-
-
 ##-----------------------------------------------------------
 ##  make it so
 
