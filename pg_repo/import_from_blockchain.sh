@@ -49,7 +49,7 @@ cd $DST_DDIR
 ## CREATE (not REPLACE) dbname= btc_hist_tester
 ##  init database with btc_hist_schemaonly.sql
 ##
-export PGDATABASE=btc_hist_tester
+export PGDATABASE=op_energy_db
 export PGHOST=localhost
 export PGPORT=5432
 export PGUSER=opdev
@@ -57,6 +57,10 @@ export PGPASSWORD=opdev
 
 ## db init needs a role w/ credentials
 ##  pg role must install plpython3
+#if [[ -z $1 ]] && [[ $1 == '-d' ]]; then
+#    psql -c "drop database ${PGDATABASE}"
+#fi
+
 createdb -w $PGDATABASE
 
 ## MOVED to python setup()
@@ -67,7 +71,7 @@ createdb -w $PGDATABASE
 ##  invoke the five line importers  TODO py3
 ##   subshell gets the ENV
 
-python ${PG_REPO}/import_base_tables.py
+python ${PG_REPO}/do_make_base_tables.py
 
 ## done
 ##=======================================================================

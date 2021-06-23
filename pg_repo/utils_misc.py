@@ -51,8 +51,8 @@ def cbits_to_hexstr( in_text):
 
   exp_const = 1 * 2** (8*(reg_exp_enc-3))
   exp_varying = reg_difficulty * exp_const
-  bitCnt = ( exp_var.bit_length() +7)/8
-  return hex( exp_var)
+  bitCnt = ( exp_varying.bit_length() +7)/8
+  return hex( exp_varying)
 
 
 #--------------------------------
@@ -64,7 +64,7 @@ def uintstr_to_hexstr( in_text):
 
 #--------------------------------
 def fix_quoted_numbers( in_text):
-  return "0x"+in_text.strip("\"")'
+  return "0x"+in_text.strip("\"")
 
 ##------------------------------
 def hexstr_to_bigint( in_text):
@@ -94,5 +94,4 @@ def hexstr_to_cbits( in_str):
 #-----------------------------------
 def int_to_hexstr( in_integer):
   return  hex( in_integer)
-
 
