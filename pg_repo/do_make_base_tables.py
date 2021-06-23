@@ -32,7 +32,7 @@ try:
   _pguser     = os.getenv('PGUSER')
   _pgpassword = os.getenv('PGPASSWORD')
 
-  _test_mode =  False    ## TODO get from ENV
+  _test_mode = False    ## TODO get from ENV
 except:
   print( sys.argv[0] )
   print( ' ENV not complete' )
@@ -230,8 +230,8 @@ def do_import_bbits():
     if (  int(ln0_height) % 1000 == 0):
       gconn.commit()
 
-    #if _test_mode:
-    #  break
+    if _test_mode:
+      break
 
 
   gconn.commit()
@@ -249,12 +249,11 @@ def do_import_bbits():
 ##-----------------------------------------------------------
 ##  make it so
 
-if _test_mode:
-  exit(0)
-
 setup()
 do_import_bbits()
-do_import_bstats()
+#do_import_bstats()
+
+#do_make_datachain()
 
 
 ## 21jun21
@@ -266,7 +265,6 @@ do_import_bstats()
 #for an_import in g_all_imports:
 #    import_table( an_import[0], an_import[1], an_import[2] )
 
-#do_make_datachain()
 
 #----
 # END
