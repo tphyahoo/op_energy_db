@@ -4,6 +4,7 @@
 
 -- Dumped from database version 12.6 (Debian 12.6-1.pgdg100+1)
 -- Dumped by pg_dump version 12.6 (Debian 12.6-1.pgdg100+1)
+--  modified as needed  jun21  -dbb
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -28,20 +29,7 @@ CREATE EXTENSION IF NOT EXISTS plpython3u WITH SCHEMA pg_catalog;
 
 COMMENT ON EXTENSION plpython3u IS 'PL/Python3U untrusted procedural language';
 
---
--- Name: bigint_to_hexstr(bigint); Type: FUNCTION; Schema: public; Owner: opdev
---
-
-CREATE FUNCTION public.bigint_to_hexstr(bigint) RETURNS text
-    LANGUAGE plpython3u
-    AS $$
-  tBInt = args[0]
-  return  hex(tBInt)
-$$;
-
-
-ALTER FUNCTION public.bigint_to_hexstr(bigint) OWNER TO opdev;
-
+-------------------------------------------------------------------------------
 --
 -- Name: calculate_energy_price(integer, bigint, bigint, text, integer, bigint, bigint, text); Type: FUNCTION; Schema: public; Owner: opdev
 --
@@ -72,11 +60,11 @@ CREATE FUNCTION public.calculate_energy_price_print(blka_height integer, blka_me
     AS $$
   ##  note that postgres casts identifiers to lower-case silently
   res_str = ''
-  res_str = 'blkA_height:' + str(blka_height) 
+  res_str = 'blkA_height:' + str(blka_height)
   res_str = res_str + '; blkA_median_time:' + str(blka_median_time)
   res_str = res_str + '; blkA_chain_reward:' + str(blka_chain_reward)
   res_str = res_str + '; blkA_chainwork_hex: ' + blka_chainwork_hex
-  res_str = res_str + '; blkB_height:' + str(blkb_height) 
+  res_str = res_str + '; blkB_height:' + str(blkb_height)
   res_str = res_str + '; blkB_median_time:' + str(blkb_median_time)
   res_str = res_str + '; blkB_chain_reward:' + str(blkb_chain_reward)
   res_str = res_str + '; blkB_chainwork_hex: ' + blkb_chainwork_hex
@@ -93,6 +81,8 @@ ALTER FUNCTION public.calculate_energy_price_print(blka_height integer, blka_med
 -- BitcoinD ref:
 --  https://github.com/bitcoin/bitcoin/blob/master/src/arith_uint256.cpp#L203
 --
+-- btcD ref:
+--  https://github.com/btcsuite/btcd/blob/master/blockchain/difficulty.go#L38
 
 CREATE FUNCTION public.cbits_to_hexstr(text) RETURNS text
     LANGUAGE plpython3u
@@ -110,33 +100,7 @@ $$;
 
 ALTER FUNCTION public.cbits_to_hexstr(text) OWNER TO opdev;
 
---
--- Name: uintstr_to_hexstr(text); Type: FUNCTION; Schema: public; Owner: opdev
---
-
-CREATE FUNCTION public.uintstr_to_hexstr(text) RETURNS text
- AS '
-  tStr = args[0]
-  tStr = tStr.strip( "\"")
-  tStr = tStr.lstrip("0")
-  return "0x"+tStr
-' LANGUAGE plpython3u;
-
-ALTER FUNCTION public.uintstr_to_hexstr(text) OWNER TO opdev;
-
---
--- Name: fix_quoted_numbers(text); Type: FUNCTION; Schema: public; Owner: opdev
---
-
-CREATE FUNCTION public.fix_quoted_numbers(text) RETURNS text
- AS '
-  tStr = args[0]
-  return "0x"+tStr.strip("\"")'
-LANGUAGE plpython3u;
-
-ALTER FUNCTION public.fix_quoted_numbers(text) OWNER TO opdev;
-
-
+-----------------------------------------------------------------------------
 --
 -- Name: hexstr_to_bigint(text); Type: FUNCTION; Schema: public; Owner: opdev
 --
@@ -155,6 +119,9 @@ ALTER FUNCTION public.hexstr_to_bigint(text) OWNER TO opdev;
 --
 -- BitcoinD ref: 
 --  https://github.com/bitcoin/bitcoin/blob/master/src/arith_uint256.cpp#L223
+--
+-- btcD ref:
+--  https://github.com/btcsuite/btcd/blob/master/blockchain/difficulty.go#L89
 --
 
 CREATE FUNCTION public.hexstr_to_cbits(text) RETURNS text
@@ -185,6 +152,7 @@ $$;
 ALTER FUNCTION public.hexstr_to_cbits(text) OWNER TO opdev;
 
 --
+--
 -- Name: int_to_hexstr(integer); Type: FUNCTION; Schema: public; Owner: opdev
 --
 
@@ -197,6 +165,50 @@ $$;
 
 
 ALTER FUNCTION public.int_to_hexstr(integer) OWNER TO opdev;
+
+--
+--
+-- Name: uintstr_to_hexstr(text); Type: FUNCTION; Schema: public; Owner: opdev
+--
+
+CREATE FUNCTION public.uintstr_to_hexstr(text) RETURNS text
+ AS '
+  tStr = args[0]
+  tStr = tStr.strip( "\"")
+  tStr = tStr.lstrip("0")
+  return "0x"+tStr
+' LANGUAGE plpython3u;
+
+ALTER FUNCTION public.uintstr_to_hexstr(text) OWNER TO opdev;
+
+--
+-- Name: fix_quoted_numbers(text); Type: FUNCTION; Schema: public; Owner: opdev
+--
+
+CREATE FUNCTION public.fix_quoted_numbers(text) RETURNS text
+ AS '
+  tStr = args[0]
+  return "0x"+tStr.strip("\"")'
+LANGUAGE plpython3u;
+
+ALTER FUNCTION public.fix_quoted_numbers(text) OWNER TO opdev;
+
+--
+--
+-- Name: bigint_to_hexstr(bigint); Type: FUNCTION; Schema: public; Owner: opdev
+--
+
+CREATE FUNCTION public.bigint_to_hexstr(bigint) RETURNS text
+    LANGUAGE plpython3u
+    AS $$
+  tBInt = args[0]
+  return  hex(tBInt)
+$$;
+
+
+ALTER FUNCTION public.bigint_to_hexstr(bigint) OWNER TO opdev;
+
+--
 
 SET default_tablespace = '';
 
