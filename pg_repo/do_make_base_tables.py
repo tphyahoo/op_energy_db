@@ -215,6 +215,7 @@ def do_import_bbits():
   global _test_mode
   global gcurs, gconn
 
+  ##  - check if the current $HEIGHT is up to date
   ##  -- get highest block in_bit_raw .
   ##  --  looking in blockchain, look for that block+1, with 100 confirmations. (for both scripts) (stats and bits)
   ##  -- INSERT data
@@ -258,12 +259,6 @@ def do_import_bbits():
 
 ##----------------------------------------------------------------
 def do_main_loop():
-    #-----------------------------
-    # DESIGN  call the entry function here once
-    #  - check if the current $HEIGHT is up to date
-    #  -  if no -  get and insert one row of bits+stats+data_chain
-    #     if yes - sleep(1)
-    #  
 
     looping_flag = True
     while (looping_flag):
