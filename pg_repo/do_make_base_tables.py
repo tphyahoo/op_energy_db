@@ -19,7 +19,6 @@ gcurs = None
 #exit(1)
 
 ##- setup for PG connection
-
 # if 'PGDATABASE' in os.environ:
 try:
   _pgrepo   = os.getenv('PG_REPO')+'/'
@@ -32,7 +31,7 @@ try:
   _pguser     = os.getenv('PGUSER')
   _pgpassword = os.getenv('PGPASSWORD')
 
-  _test_mode = True    ## TODO get from ENV
+  _test_mode  = False    ## TODO get from ENV
 except:
   print( sys.argv[0] )
   print( ' ENV not complete' )
@@ -257,13 +256,12 @@ def do_next_block():
     ##        SELECT max(height) from in_bits_raw;
     ##
     ##  -- ask for $HEIGHT+1
-    ##         text file
+    ##  --   if EMPTY return else 
+    ##         if text file  else
     ##              extract rows for $HEIGHT+1 from textfile
     ##
     ##  --     blockchain, look for that block+1, with 100 confirmations. 
     ##            (for both scripts) (stats and bits)
-    ##
-    ##  --   test for empty result, if EMPTY return 
     ##
     ##  -- INSERT data
     ##        insert row into raw tables (for sanity / logging)
