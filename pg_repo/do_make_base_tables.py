@@ -204,12 +204,10 @@ def do_import_bbits():
   global _test_mode
   global gcurs, gconn
 
-  ##  a) get highest block in_bit_raw .
-  ##  b)  .. (tbd)
-  ##  c)  looking in blockchain, look for that block+1, with 100 confirmations. (for both scripts) (stats and bits)
-  ##  d) INSERT data
-  ##    insert row into raw tables (for sanity / logging)
-  ##
+  ##  -- get highest block in_bit_raw .
+  ##  --  looking in blockchain, look for that block+1, with 100 confirmations. (for both scripts) (stats and bits)
+  ##  -- INSERT data
+  ##        insert row into raw tables (for sanity / logging)
   ##----------------
   ##  SELECT max(height) from in_bits_raw;
   ##---------------------------------------------
