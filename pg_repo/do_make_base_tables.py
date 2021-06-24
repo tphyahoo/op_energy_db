@@ -250,17 +250,26 @@ def do_import_bbits():
 
 ##----------------------------------------
 def do_next_block():
-    ##  - check if the current $HEIGHT is up to date
-    ##  -- get highest block in_bit_raw .
-    ##  --  looking in blockchain, look for that block+1, with 100 confirmations. (for both scripts) (stats and bits)
+
+    ##  TEST current $HEIGHT up to date?
+    ##
+    ##  -- get highest block in_bit_raw  (already known)
+    ##        SELECT max(height) from in_bits_raw;
+    ##
+    ##  -- ask for $HEIGHT+1
+    ##         text file, seek for row   OR
+    ##  --     blockchain, look for that block+1, with 100 confirmations. 
+    ##            (for both scripts) (stats and bits)
+    ##
+    ##  --   test for empty result, if EMPTY return 
+    ##
     ##  -- INSERT data
     ##        insert row into raw tables (for sanity / logging)
     ##----------------
-    ##  SELECT max(height) from in_bits_raw;
     ##---------------------------------------------
 
+
     ##------------------------
-    do_import_bbits()
     return
 
 
