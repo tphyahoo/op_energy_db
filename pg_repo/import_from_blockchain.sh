@@ -46,7 +46,7 @@ tar x --directory=$DST_DDIR -f $SRC_DATAFILE
 cd $DST_DDIR
 
 ##=====================================================
-## CREATE (not REPLACE) dbname= btc_hist_tester
+## CREATE (not REPLACE) postgres database
 ##  init database with btc_hist_schemaonly.sql
 ##
 export PGDATABASE=op_energy_db
@@ -55,15 +55,16 @@ export PGPORT=5432
 export PGUSER=opdev
 export PGPASSWORD=opdev
 
-## db init needs a role w/ credentials
-##  pg role must install plpython3
+## db init requires a postgresql role w/ credentials
+##  and must install plpython3
+## TODO this test is flawed - fixme w/ getopts?
 #if [[ -z $1 ]] && [[ $1 == '-d' ]]; then
 #    psql -c "drop database ${PGDATABASE}"
 #fi
 
 createdb -w $PGDATABASE
 
-## MOVED to python setup()
+## remaining MOVED to python setup()
 # psql -w $PGDATABASE  -q  < ${PG_REPO}/btc_hist_schemaonly.sql
 # psql -w $PGDATABASE -q -f ${SRC_DDIR}/in_btc_raw.sql
 
