@@ -196,6 +196,11 @@ def do_import_bstats():
 
   return
 
+#-------------------------------------------------------------
+def get_block_bits_row( in_height ):
+  res_data = 0
+  return res_data
+
 
 #-------------------------------------------------------------
 #  read and store a text datafile in custom format
@@ -243,6 +248,7 @@ def do_import_bbits():
 
 
   return
+
 
 
 ##-----------------------------------------------------------
