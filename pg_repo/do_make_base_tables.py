@@ -276,8 +276,7 @@ def do_main_loop():
         #do_import_bstats()
 
         #do_make_datachain()
-
-
+        sleep(1)
 
 
     ## done 
