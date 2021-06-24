@@ -256,6 +256,12 @@ def do_import_bbits():
 
   return
 
+##----------------------------------------
+def do_next_block():
+    ##------------------------
+    do_import_bbits()
+    return
+
 
 ##----------------------------------------------------------------
 def do_main_loop():
@@ -263,7 +269,7 @@ def do_main_loop():
     looping_flag = True
     while (looping_flag):
 
-        do_import_bbits()  ##- tmp make this work, add bstats+data_chain after
+        do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
         #if _test_mode:
         #  exit(0)
