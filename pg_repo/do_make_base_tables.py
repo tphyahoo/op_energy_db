@@ -261,6 +261,13 @@ def do_import_bbits():
 ##  make it so
 
 setup()
+
+#-----------------------------
+# DESIGN  call the entry function here once
+#  - check if the current $HEIGHT is up to date
+#  -  if no -  get and insert one row of bits+stats+data_chain
+#     if yes - sleep(1)
+#  
 do_import_bbits()
 
 if _test_mode:
