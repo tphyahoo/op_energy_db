@@ -205,7 +205,7 @@ def do_import_bbits():
   global gcurs, gconn
 
   ##----------------
-
+  ##  SELECT max(height) from in_bits_raw;
   ##---------------------------------------------
   try:
     rdF = open( _dst_ddir+'blockbits.txt', 'r' )
