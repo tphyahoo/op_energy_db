@@ -256,36 +256,40 @@ def do_import_bbits():
   return
 
 
+##----------------------------------------------------------------
+def do_main_loop():
+    #-----------------------------
+    # DESIGN  call the entry function here once
+    #  - check if the current $HEIGHT is up to date
+    #  -  if no -  get and insert one row of bits+stats+data_chain
+    #     if yes - sleep(1)
+    #  
+    do_import_bbits()
+
+    if _test_mode:
+      exit(0)
+
+    do_import_bstats()
+
+    do_make_datachain()
+
+
+    ## 21jun21
+    ##  seperate the creation of the tables
+    ##  make a single row+INSERT into an atomic action
+    ##  add control flow toiterate across the chain to the tip
+
+
+    #for an_import in g_all_imports:
+    #    import_table( an_import[0], an_import[1], an_import[2] )
+
 
 ##-----------------------------------------------------------
-##  make it so
+##  MAIN -- make it so
 
 setup()
 
-#-----------------------------
-# DESIGN  call the entry function here once
-#  - check if the current $HEIGHT is up to date
-#  -  if no -  get and insert one row of bits+stats+data_chain
-#     if yes - sleep(1)
-#  
-do_import_bbits()
-
-if _test_mode:
-  exit(0)
-
-do_import_bstats()
-
-do_make_datachain()
-
-
-## 21jun21
-##  seperate the creation of the tables
-##  make a single row+INSERT into an atomic action
-##  add control flow toiterate across the chain to the tip
-
-
-#for an_import in g_all_imports:
-#    import_table( an_import[0], an_import[1], an_import[2] )
+do_main_loop()
 
 #----
 # END
