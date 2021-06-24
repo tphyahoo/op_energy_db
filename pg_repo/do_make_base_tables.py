@@ -2,7 +2,7 @@
 """
 Created on Sun Jun 13 06:10:03 2021
 
-@author: dbb
+@author: thartman, dbb
 """
 
 import sys,os
