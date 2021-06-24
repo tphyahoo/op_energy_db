@@ -205,7 +205,7 @@ def do_import_bbits():
   global gcurs, gconn
 
   ##  a) get highest block in_bit_raw .
-  ##  b) get chain_subsidy and chain_totalfees in data_chain table, for this highest block.
+  ##  b)  .. (tbd)
   ##  c)  looking in blockchain, look for that block+1, with 100 confirmations. (for both scripts) (stats and bits)
   ##  d) INSERT data
   ##    insert row into raw tables (for sanity / logging)
