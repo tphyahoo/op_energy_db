@@ -203,8 +203,6 @@ def get_block_bits_row( in_height ):
 
 
 #-------------------------------------------------------------
-#  read and store a text datafile in custom format
-#   rely on table definition in the template; may change
 #
 #  TOP Level Design is:   
 #   this function will get called every time the tool is run
