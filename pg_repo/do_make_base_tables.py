@@ -264,25 +264,24 @@ def do_main_loop():
     #  -  if no -  get and insert one row of bits+stats+data_chain
     #     if yes - sleep(1)
     #  
-    do_import_bbits()  ##- tmp make this work, add bstats+data_chain after
 
-    #if _test_mode:
-    #  exit(0)
+    looping_flag = True
+    while (looping_flag):
 
-    #do_import_bstats()
+        do_import_bbits()  ##- tmp make this work, add bstats+data_chain after
 
-    #do_make_datachain()
+        #if _test_mode:
+        #  exit(0)
 
+        #do_import_bstats()
 
-    ## 21jun21
-    ##  seperate the creation of the tables
-    ##  make a single row+INSERT into an atomic action
-    ##  add control flow toiterate across the chain to the tip
+        #do_make_datachain()
 
 
-    #for an_import in g_all_imports:
-    #    import_table( an_import[0], an_import[1], an_import[2] )
 
+
+    ## done 
+    return
 
 ##-----------------------------------------------------------
 ##  MAIN -- make it so
