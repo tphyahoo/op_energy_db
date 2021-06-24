@@ -264,14 +264,14 @@ def do_main_loop():
     #  -  if no -  get and insert one row of bits+stats+data_chain
     #     if yes - sleep(1)
     #  
-    do_import_bbits()
+    do_import_bbits()  ##- tmp make this work, add bstats+data_chain after
 
-    if _test_mode:
-      exit(0)
+    #if _test_mode:
+    #  exit(0)
 
-    do_import_bstats()
+    #do_import_bstats()
 
-    do_make_datachain()
+    #do_make_datachain()
 
 
     ## 21jun21
