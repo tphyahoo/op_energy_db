@@ -205,6 +205,14 @@ def get_block_bits_row( in_height ):
 #-------------------------------------------------------------
 #  read and store a text datafile in custom format
 #   rely on table definition in the template; may change
+#
+#  TOP Level Design is:   
+#   this function will get called every time the tool is run
+#   check if an update is needed?  if no update needed, just return
+#   If an update is needed, call function get_block_bits_row()
+#    to get the row, INSERT the row, done
+#
+
 def do_import_bbits():
   global _test_mode
   global gcurs, gconn
