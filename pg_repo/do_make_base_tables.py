@@ -6,6 +6,7 @@ Created on Sun Jun 13 06:10:03 2021
 """
 
 import sys,os
+import time
 import psycopg2
 
 ## define one PG connection, one cursor
@@ -311,7 +312,7 @@ def do_main_loop():
         #do_import_bstats()
 
         #do_make_datachain()
-        sleep(1)
+        time.sleep(1)
 
 
     ## done 
