@@ -293,7 +293,6 @@ def do_import_bstats():
 
 #-------------------------------------------------------------
 def get_block_bits_row( in_height ):
-  res_data     = None
   local_height = len(g_bits_rows)
 
   if local_height > in_height :
