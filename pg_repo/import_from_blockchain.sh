@@ -30,7 +30,7 @@ VERBOSE='true'
 SDEBUG='false'
 while getopts ':dv' flag; do
   case "${flag}" in
-    a) SDEBUG='true' ;;
+    d) SDEBUG='true' ;;
     v) VERBOSE='true' ;;
   esac
 done
