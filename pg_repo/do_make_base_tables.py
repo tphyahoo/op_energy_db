@@ -268,7 +268,7 @@ def do_next_block():
 
     try:
       qry_SQL = 'with rows as (SELECT height_str::integer as height from in_bits_raw) SELECT max(rows.height) from rows'
-      gcurs.execute( init_SQL )
+      gcurs.execute( qry_SQL )
     except Exception, E:
       print(str(E))
     g_height_imported = gcurs.fetchall()[0]
