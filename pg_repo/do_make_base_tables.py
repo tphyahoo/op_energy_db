@@ -97,32 +97,33 @@ def setup():
     except Exception, E:
       print(str(E))
 
-  ##-----------------------------------------------------------------
-  try:
-    infile_name = 'blockbits.txt'
-    bitstxt_fd = open( _dst_ddir+infile_name, 'r' )
-  except Exception, E:
-    print( str(E) )
-    exit(1)
+    ##-----------------------------------------------------------------
+    try:
+      infile_name = 'blockbits.txt'
+      bitstxt_fd = open( _dst_ddir+infile_name, 'r' )
+    except Exception, E:
+      print( str(E) )
+      exit(1)
 
   
-  while True:
-    ln0_height = bitstxt_fd.readline()
-    if (cmp( ln0_height, '') == 0):
-        break
+    while True:
+      ln0_height = bitstxt_fd.readline()
+      if (cmp( ln0_height, '') == 0):
+          break
 
-    ln0_height      =  ln0_height.strip()
-    ln1_blockhash   =  bitstxt_fd.readline().strip()
-    ln2_subsidy     =  bitstxt_fd.readline().strip()
-    ln3_totalfee    =  bitstxt_fd.readline().strip()
-    ln4_time        =  bitstxt_fd.readline().strip()
-    ln5_mediantime  =  bitstxt_fd.readline().strip()
-    ln4_time        =  bitstxt_fd.readline().strip()
-    local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time )
-    g_bits_rows.append(local_row)
+      ln0_height      =  ln0_height.strip()
+      ln1_blockhash   =  bitstxt_fd.readline().strip()
+      ln2_subsidy     =  bitstxt_fd.readline().strip()
+      ln3_totalfee    =  bitstxt_fd.readline().strip()
+      ln4_time        =  bitstxt_fd.readline().strip()
+      ln5_mediantime  =  bitstxt_fd.readline().strip()
+
+      local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time )
+      g_bits_rows.append(local_row)
 
 
-
+  return
+  # done setup()
 
 #-------------------------------------------------------------
 #  read and store a text datafile in custom format
