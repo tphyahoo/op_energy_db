@@ -29,11 +29,12 @@ export PG_REPO
 VERBOSE='true'
 SDEBUG='false'
 while getopts 'd:v' flag; do
-case "${flag}" in
-  a) SDEBUG='true' ;;
-  v) VERBOSE='true' ;;
-  *) error "Unexpected option ${flag}" ;;
-esac
+  case "${flag}" in
+    a) SDEBUG='true' ;;
+    v) VERBOSE='true' ;;
+    *) error "Unexpected option ${flag}" ;;
+  esac
+done
 
 echo 'VERBOSE='${VERBOSE}
 echo 'SDEBUG='${SDEBUG}
