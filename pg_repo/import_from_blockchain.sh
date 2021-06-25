@@ -24,6 +24,21 @@ set -uve
 PG_REPO=$(dirname $(readlink -f $0))   #;echo 'PG_REPO='${PG_REPO}
 export PG_REPO
 
+
+## look for command line options
+VERBOSE='true'
+SDEBUG='false'
+while getopts 'd:v' flag; do
+case "${flag}" in
+  a) SDEBUG='true' ;;
+  v) VERBOSE='true' ;;
+  *) error "Unexpected option ${flag}" ;;
+esac
+
+echo 'VERBOSE='${VERBOSE}
+echo 'SDEBUG='${SDEBUG}
+exit
+
 ##========================================
 ##  GET copy of source_data tgz
 ##
