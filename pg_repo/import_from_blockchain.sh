@@ -32,7 +32,6 @@ while getopts ':dv' flag; do
   case "${flag}" in
     a) SDEBUG='true' ;;
     v) VERBOSE='true' ;;
-    *) error "Unexpected option ${flag}" ;;
   esac
 done
 
