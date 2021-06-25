@@ -119,6 +119,7 @@ def setup():
     ln5_mediantime  =  bitstxt_fd.readline().strip()
     ln4_time        =  bitstxt_fd.readline().strip()
     local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time )
+    g_bits_rows.append(local_row)
 
 
 
@@ -226,7 +227,11 @@ def do_import_bstats():
 
 #-------------------------------------------------------------
 def get_block_bits_row( in_height ):
-  res_data = 0
+  res_data = None
+  local_height = len(g_bits_rows)
+  if local_height > in_height :
+    res_data = g_bits_rows[in_height]
+
   return res_data
 
 
