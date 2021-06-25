@@ -28,7 +28,7 @@ export PG_REPO
 ## look for command line options
 VERBOSE='true'
 SDEBUG='false'
-while getopts 'd:v' flag; do
+while getopts 'dv' flag; do
   case "${flag}" in
     a) SDEBUG='true' ;;
     v) VERBOSE='true' ;;
