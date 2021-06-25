@@ -44,6 +44,11 @@ g_all_imports = {
     ( 'blockstats.txt','in_stats_raw', 6 )
 }
 
+## tip count of the local data_chain
+g_height_imported = 0
+
+g_bits_rows = []  # empty list, ready for tuples
+
 #--------------
 def setup():
     # establish a PG connection using credentials passed by ENV
@@ -91,6 +96,30 @@ def setup():
       gconn.commit()
     except Exception, E:
       print(str(E))
+
+  ##-----------------------------------------------------------------
+  try:
+    infile_name = 'blockbits.txt'
+    bitstxt_fd = open( _dst_ddir+infile_name, 'r' )
+  except Exception, E:
+    print( str(E) )
+    exit(1)
+
+  
+  while True:
+    ln0_height = bitstxt_fd.readline()
+    if (cmp( ln0_height, '') == 0):
+        break
+
+    ln0_height      =  ln0_height.strip()
+    ln1_blockhash   =  bitstxt_fd.readline().strip()
+    ln2_subsidy     =  bitstxt_fd.readline().strip()
+    ln3_totalfee    =  bitstxt_fd.readline().strip()
+    ln4_time        =  bitstxt_fd.readline().strip()
+    ln5_mediantime  =  bitstxt_fd.readline().strip()
+    ln4_time        =  bitstxt_fd.readline().strip()
+    local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time )
+
 
 
 ##========================
@@ -253,7 +282,6 @@ def do_next_block():
     ##  TEST current $HEIGHT up to date?
     ##
     ##  -- get highest block in_bit_raw  (already known)
-    ##        SELECT max(height) from in_bits_raw;
     ##
     ##  -- ask for $HEIGHT+1
     ##  --   if EMPTY return else 
@@ -268,6 +296,17 @@ def do_next_block():
     ##----------------
     ##---------------------------------------------
 
+    try:
+      qry_SQL = 'with rows as (SELECT height_str::integer as height from in_bits_raw) SELECT max(rows.height) from rows'
+      gcurs.execute( init_SQL )
+    except Exception, E:
+      print(str(E))
+    bits_count = gcurs.fetchall()[0]
+    #g_height_imported
+
+    block_row_bits = get_block_bits_row( bits_count+1 )
+    if block_row_bits is None or block_row_bits == '':
+        return   # nothing to do
 
     ##------------------------
     return
