@@ -122,7 +122,9 @@ def setup():
       local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time )
       g_bits_rows.append(local_row)
 
-
+    print( "str(g_bits_rows)")
+    print( str(g_bits_rows))
+    exit
     return
     # done setup()
 
