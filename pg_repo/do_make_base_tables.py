@@ -122,8 +122,8 @@ def setup():
       g_bits_rows.append(local_row)
 
 
-  return
-  # done setup()
+    return
+    # done setup()
 
 #-------------------------------------------------------------
 #  read and store a text datafile in custom format
