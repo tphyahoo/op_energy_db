@@ -35,9 +35,13 @@ while getopts ':dv' flag; do
   esac
 done
 
-echo 'VERBOSE='${VERBOSE}
-echo 'SDEBUG='${SDEBUG}
-exit
+#echo 'VERBOSE='${VERBOSE}
+#echo 'SDEBUG='${SDEBUG}
+if [[ ${SDEBUG} == 'true' ]]; then
+  echo "SDEBUG = true"
+fi
+
+
 
 ##========================================
 ##  GET copy of source_data tgz
