@@ -26,8 +26,8 @@ export PG_REPO
 
 
 ## look for command line options
-VERBOSE='true'
-SDEBUG='false'
+export VERBOSE='true'
+export SDEBUG='false'
 while getopts ':dv' flag; do
   case "${flag}" in
     d) SDEBUG='true' ;;
@@ -37,18 +37,22 @@ done
 
 #echo 'VERBOSE='${VERBOSE}
 #echo 'SDEBUG='${SDEBUG}
-if [[ ${SDEBUG} == 'true' ]]; then
-  echo "SDEBUG = true"
-fi
-
 
 
 ##========================================
 ##  GET copy of source_data tgz
 ##
 export SRC_DDIR=/var/local/opdev/
-SRC_DATAFILE=btcdata_1600585200.tgz
+
+if [[ ${SDEBUG} == 'true' ]]; then
+  #echo "SDEBUG = true"
+  SRC_DATAFILE=btcdata_1600585200_small.tgz
+else
+  SRC_DATAFILE=btcdata_1600585200.tgz
+fi
+
 SRC_MD5SUM=$SRC_DATAFILE.md5sum
+
 
 ## compare MD5 to expected, fail if no match
 cd $SRC_DDIR
