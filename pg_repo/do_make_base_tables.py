@@ -191,8 +191,9 @@ def do_import_bstats():
 
 #-------------------------------------------------------------
 def get_block_bits_row( in_height ):
-  res_data = None
+  res_data     = None
   local_height = len(g_bits_rows)
+
   if local_height > in_height :
     res_data = g_bits_rows[in_height]
 
@@ -271,7 +272,7 @@ def do_next_block():
       gcurs.execute( qry_SQL )
     except Exception, E:
       print(str(E))
-    g_height_imported = gcurs.fetchall()[0]
+    g_height_imported = gcurs.fetchone()[0]
     #g_height_imported
 
     block_bits_row = get_block_bits_row( g_height_imported+1 )
