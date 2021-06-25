@@ -298,6 +298,8 @@ def get_block_bits_row( in_height ):
 
   if local_height > in_height :
     res_data = g_bits_rows[in_height]
+  else:
+    res_data = None
 
   return res_data
 
