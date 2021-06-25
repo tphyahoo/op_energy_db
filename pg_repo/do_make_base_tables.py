@@ -428,45 +428,7 @@ do_main_loop()
 
 
 ##-----------------------------------------------------------
-##  reference and TBD
 
-##========================
-def do_make_datachain():
-
-    t_SQL = '''
-    create table data_chain as (
-      SELECT b.height_str::integer           as blockheight,
-            fix_quoted_numbers(b.hash_str)   as blockhash,
-            uintstr_to_hexstr(cbits_str)      as compact_bits_hex,
-            b.difficulty_str::float          as difficulty,
-            uintstr_to_hexstr(chainwork_str) as chainwork_hex,
-            0::bigint as chain_reward,   -- derive this, remove in_btc_raw
-            0::bigint as chain_subsidy,
-            0::bigint as chain_totalfee,
-            in_stats_raw.median_time_str::integer as median_time,
-            in_stats_raw.block_time_str::integer  as block_time
-      FROM public.in_bits_raw as b
-      LEFT JOIN
-        in_stats_raw on (b.height_str = in_stats_raw.height_str)
-    )
-    '''
-    end_SQL = "ALTER TABLE data_chain add PRIMARY KEY(blockheight);"
-
-    try:
-        gcurs.execute( t_SQL )
-    except Exception, E:
-      print str(E)
-      exit(1)
-
-    try:
-        gcurs.execute( end_SQL )
-    except Exception, E:
-      print str(E)
-      exit(1)
-
-    gconn.commit()
-
-    return
 
 #----
 # END
