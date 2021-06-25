@@ -9,8 +9,6 @@ import sys,os
 import time
 import psycopg2
 
-from misc_utils import uintstr_to_hexstr
-
 ## define one PG connection, one cursor
 gconn = None
 gcurs = None
