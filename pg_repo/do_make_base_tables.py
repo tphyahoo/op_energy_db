@@ -9,6 +9,8 @@ import sys,os
 import time
 import psycopg2
 
+from misc_utils import uintstr_to_hexstr
+
 ## define one PG connection, one cursor
 gconn = None
 gcurs = None
@@ -113,7 +115,7 @@ def setup():
           break
 
       ln0_height      =  ln0_height.strip()
-      ln1_blockhash   =  bitstxt_fd.readline().strip()
+      ln1_blockhash   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
       ln2_subsidy     =  bitstxt_fd.readline().strip()
       ln3_totalfee    =  bitstxt_fd.readline().strip()
       ln4_time        =  bitstxt_fd.readline().strip()
