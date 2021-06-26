@@ -176,8 +176,10 @@ def setup():
         print str(E)
         exit(1)
 
-    ## see  bitcoin-cli getblockstats $HEIGHT
-    ## height, blockhash, bits, difficulty, chainwork
+    ##-----------------------------------------------------------------
+    ##  import first info file -- blockbits -- 
+    ##   ref.  bitcoin-cli getblockstats $HEIGHT
+    ##   ( height, blockhash, bits, difficulty, chainwork )
     init_ibr_SQL = '''
     DROP table if exists in_bits_raw cascade;
     CREATE TABLE public.in_bits_raw (
@@ -188,7 +190,6 @@ def setup():
       chainwork_str text
     );
     '''
-
     try:
       comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
       gcurs.execute( init_ibr_SQL )
@@ -196,8 +197,7 @@ def setup():
       gconn.commit()
     except Exception, E:
       print(str(E))
-
-    ##-----------------------------------------------------------------
+    ## -----------------------------------------------
     try:
       infile_name = 'blockbits.txt'
       bitstxt_fd = open( _dst_ddir+infile_name, 'r' )
@@ -205,7 +205,6 @@ def setup():
       print( str(E) )
       exit(1)
 
-  
     while True:
       ln0_height = bitstxt_fd.readline()
       if (cmp( ln0_height, '') == 0):
