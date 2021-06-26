@@ -207,9 +207,9 @@ def setup():
 
       ln0_height      =  ln0_height.strip()
       ln1_blockhash   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
-      ln2_cbits       =  bitstxt_fd.readline().strip()
+      ln2_cbits       =  fix_quoted_numbers( bitstxt_fd.readline().strip() )
       ln3_difficulty  =  bitstxt_fd.readline().strip()
-      ln4_chainwork   =  bitstxt_fd.readline().strip()
+      ln4_chainwork   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
 
       local_row = (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork )
       print('local_row (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork)')
