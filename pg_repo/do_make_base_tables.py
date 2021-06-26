@@ -218,6 +218,8 @@ def setup():
       ln5_mediantime  =  bitstxt_fd.readline().strip()
 
       local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time )
+      print('local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time )')
+      print(str(local_row))
       g_bits_rows.append(local_row)
 
     print( "str(g_bits_rows)")
