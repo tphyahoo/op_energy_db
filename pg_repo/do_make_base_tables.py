@@ -253,6 +253,8 @@ def get_block_bits_row( in_height ):
   else:
     res_data = None
 
+  print(' in_height :'+str(in_height)+'; local_height:'+str(local_height))
+  print(' '+str(res_data))
   return res_data
 
 
