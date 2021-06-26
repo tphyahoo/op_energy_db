@@ -370,13 +370,13 @@ def do_next_block():
     ##---------------------------------------------
 
     if (g_height_imported > 0):
-        try:
-          qry_SQL = 'with rows as (SELECT height_str::integer as height from in_bits_raw) SELECT max(rows.height) from rows'
-          gcurs.execute( qry_SQL )
-        except Exception, E:
-          print(str(E))
-        g_height_imported = gcurs.fetchone()[0]
-        #g_height_imported
+        #try:
+        #  qry_SQL = 'with rows as (SELECT height_str::integer as height from in_bits_raw) SELECT max(rows.height) from rows'
+        #  gcurs.execute( qry_SQL )
+        #except Exception, E:
+        #  print(str(E))
+        #g_height_imported = gcurs.fetchone()[0]
+        print( str(g_height_imported))
 
     block_bits_row = get_block_bits_row( g_height_imported+1 )
     if block_bits_row is None or block_bits_row == '':
