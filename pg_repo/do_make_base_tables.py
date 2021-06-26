@@ -377,6 +377,7 @@ def do_next_block():
 
     block_bits_row = get_block_bits_row( g_height_imported+1 )
     if block_bits_row is None or block_bits_row == '':
+        print('DEBUG loop - nothing to do')
         return   # nothing to do
     
     ## update global row list and counter
@@ -393,6 +394,7 @@ def do_next_block():
       print(str(E))
 
     ##------------------------
+    print('DEBUG loop - exit')
     return
 
 
