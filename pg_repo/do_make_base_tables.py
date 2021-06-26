@@ -32,7 +32,8 @@ try:
   _pguser     = os.getenv('PGUSER')
   _pgpassword = os.getenv('PGPASSWORD')
 
-  _test_mode  = False    ## TODO get from ENV
+  _test_mode  = os.getenv('SDEBUG') 
+  _verbose    = os.getenv('VERBOSE')
 except:
   print( sys.argv[0] )
   print( ' ENV not complete' )
@@ -227,12 +228,12 @@ def do_import_bbits():
       ln4_chainwork   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
 
       local_row = (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork )
-      print('local_row (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork)')
-      print(str(local_row))
+      if _verbose: print('local_row (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork)')
+      if _verbose: print(str(local_row))
       g_bits_rows.append(local_row)
 
-    #print( "str(g_bits_rows)")
-    #print( str(g_bits_rows))
+    if _verbose: print( "str(g_bits_rows)")
+    if _verbose: print( str(g_bits_rows))
     bitstxt_fd.close()
 
     return
@@ -350,8 +351,8 @@ def get_block_bits_row( in_height ):
   else:
     res_data = None
 
-  print(' in_height :'+str(in_height)+'; local_height:'+str(local_height))
-  print(' '+str(res_data))
+  if _verbose: print(' in_height :'+str(in_height)+'; local_height:'+str(local_height))
+  if _verbose: print(' '+str(res_data))
   return res_data
 
 #----------------------------------------------------------------
@@ -359,13 +360,14 @@ def write_block_bits_row( in_row ):
 
   #-----------
   try:
-    t_SQL = "insert into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
+    t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
     gcurs.execute( t_SQL,
         (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4]))
     gconn.commit()
   except Exception, E:
     print(str(E))
 
+  if _verbose: print('  write_block_bits_row')
   return 
 
 ##----------------------------------------
@@ -405,7 +407,7 @@ def do_next_block():
 
     block_bits_row = get_block_bits_row( g_height_imported+1 )
     if block_bits_row is None or block_bits_row == '':
-        print('DEBUG loop - nothing to do')
+        if _verbose: print('DEBUG loop - nothing to do')
         return   # nothing to do
     
     ## record the new block row
@@ -416,7 +418,7 @@ def do_next_block():
 
 
     ##------------------------
-    print('DEBUG loop - exit')
+    if _verbose: print('DEBUG loop - exit')
     return
 
 
