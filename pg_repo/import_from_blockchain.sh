@@ -26,7 +26,7 @@ export PG_REPO
 
 
 ## look for command line options
-export VERBOSE='true'
+export VERBOSE='false'
 export SDEBUG='false'
 while getopts ':dv' flag; do
   case "${flag}" in

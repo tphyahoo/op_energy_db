@@ -32,7 +32,7 @@ try:
   _pguser     = os.getenv('PGUSER')
   _pgpassword = os.getenv('PGPASSWORD')
 
-  _test_mode  = os.getenv('SDEBUG') 
+  _test_mode  = os.getenv('SDEBUG')
   _verbose    = os.getenv('VERBOSE')
 except:
   print( sys.argv[0] )
@@ -58,8 +58,8 @@ def bigint_to_hexstr( in_bigint):
   return  hex( in_bigint)
 
 #-----------------------------------
-def calculate_energy_price(  
-      blka_height, blka_median_time, blka_chain_reward, blka_chainwork_hex, 
+def calculate_energy_price(
+      blka_height, blka_median_time, blka_chain_reward, blka_chainwork_hex,
       blkb_height, blkb_median_time, blkb_chain_reward, blkb_chainwork_hex  ):
 
   #  integer, bigint, bigint, text, integer, bigint, bigint, text
@@ -73,18 +73,18 @@ def calculate_energy_price(
   return  str(price_prime)
 
 #-----------------------------------
-def calculate_energy_price_print(  
-      blka_height, blka_median_time, blka_chain_reward, blka_chainwork_hex, 
+def calculate_energy_price_print(
+      blka_height, blka_median_time, blka_chain_reward, blka_chainwork_hex,
       blkb_height, blkb_median_time, blkb_chain_reward, blkb_chainwork_hex  ):
 
   #  integer, bigint, bigint, text, integer, bigint, bigint, text
   ##  note that postgres casts identifiers to lower-case silently
   res_str = ''
-  res_str = 'blkA_height:' + str(blka_height) 
+  res_str = 'blkA_height:' + str(blka_height)
   res_str = res_str + '; blkA_median_time:' + str(blka_median_time)
   res_str = res_str + '; blkA_chain_reward:' + str(blka_chain_reward)
   res_str = res_str + '; blkA_chainwork_hex: ' + blka_chainwork_hex
-  res_str = res_str + '; blkB_height:' + str(blkb_height) 
+  res_str = res_str + '; blkB_height:' + str(blkb_height)
   res_str = res_str + '; blkB_median_time:' + str(blkb_median_time)
   res_str = res_str + '; blkB_chain_reward:' + str(blkb_chain_reward)
   res_str = res_str + '; blkB_chainwork_hex: ' + blkb_chainwork_hex
@@ -127,10 +127,10 @@ def hexstr_to_cbits( in_str):
     while True:
         cnt = cnt + 1
         res2,elem = divmod(res2,0x100)
-        if res2 < 0x100: 
+        if res2 < 0x100:
             break
 
-    ## test for high bit, and shift here   
+    ## test for high bit, and shift here
     if res2 > 127:
         cnt = cnt + 1
 
@@ -143,7 +143,7 @@ def hexstr_to_cbits( in_str):
 #-----------------------------------
 def int_to_hexstr( in_integer):
     return  hex( in_integer)
-  
+
 ##======================================================================
 
 def setup():
@@ -176,7 +176,7 @@ def setup():
     do_import_bbits()
     #do_import_bstats()
     #do_make_data_chain()
-    
+
     return
     # done setup()
 
@@ -188,7 +188,7 @@ def do_import_bbits():
     global gcurs, gconn
 
     ##-----------------------------------------------------------------
-    ##  import first info file -- blockbits -- 
+    ##  import first info file -- blockbits -
     ##   ref.  bitcoin-cli getblockstats $HEIGHT
     ##   ( height, blockhash, bits, difficulty, chainwork )
     init_ibr_SQL = '''
@@ -340,7 +340,6 @@ def do_import_bstats():
 
 #-------------------------------------------------------------
 #  get_block_bits_row
-#   
 #
 def get_block_bits_row( in_height ):
   ## request a row as 1-based $HEIGHT
@@ -368,7 +367,7 @@ def write_block_bits_row( in_row ):
     print(str(E))
 
   if _verbose: print('  write_block_bits_row')
-  return 
+  return
 
 ##----------------------------------------
 def do_next_block():
@@ -379,18 +378,18 @@ def do_next_block():
     ##  -- get highest block in_bit_raw  (already known)
     ##
     ##  -- ask for $HEIGHT+1
-    ##  --   if EMPTY return else 
+    ##  --   if EMPTY return else
     ##         if text file  else
     ##              extract rows for $HEIGHT+1 from textfile
     ##
-    ##  --     blockchain, look for that block+1, with 100 confirmations. 
+    ##  --     blockchain, look for that block+1, with 100 confirmations.
     ##            (for both scripts) (stats and bits)
     ##
     ##  -- INSERT data
     ##        insert row into raw tables (for sanity / logging)
     ##----------------
     # check if an update is needed?  if no update needed, just return
-    # If an update is needed, 
+    # If an update is needed,
     #   row = get_block_bits_row()
     #   INSERT the row, done
 
@@ -409,7 +408,7 @@ def do_next_block():
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
         return   # nothing to do
-    
+
     ## record the new block row
     write_block_bits_row( block_bits_row)
 
@@ -439,7 +438,7 @@ def do_main_loop():
         time.sleep(1)
 
 
-    ## done 
+    ## done
     return
 
 ##-----------------------------------------------------------
