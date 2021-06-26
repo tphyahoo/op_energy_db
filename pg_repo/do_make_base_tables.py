@@ -56,7 +56,6 @@ g_bits_rows = []  # empty list, ready for tuples
 def bigint_to_hexstr( in_bigint):
   return  hex( in_bigint)
 
-
 #-----------------------------------
 def calculate_energy_price(  
       blka_height, blka_median_time, blka_chain_reward, blka_chainwork_hex, 
@@ -71,7 +70,6 @@ def calculate_energy_price(
 
   price_prime,elem  = divmod( (hash_cnt * expected_secs),(actual_secs*sats) )
   return  str(price_prime)
-
 
 #-----------------------------------
 def calculate_energy_price_print(  
@@ -91,13 +89,11 @@ def calculate_energy_price_print(
   res_str = res_str + '; blkB_chainwork_hex: ' + blkb_chainwork_hex
   return  res_str
 
-
 #-----------------------------------
 # BitcoinD ref:
 #  https://github.com/bitcoin/bitcoin/blob/master/src/arith_uint256.cpp#L203
 # --
 def cbits_to_hexstr( in_text):
-
   cbits_hex = int( in_text, 16)
   reg_difficulty  = cbits_hex & 0x007FFFFF
   reg_exp_enc = (cbits_hex & 0xFF000000) >> 24
@@ -106,7 +102,6 @@ def cbits_to_hexstr( in_text):
   exp_varying = reg_difficulty * exp_const
   bitCnt = ( exp_varying.bit_length() +7)/8
   return hex( exp_varying)
-
 
 #--------------------------------
 def uintstr_to_hexstr( in_text):
@@ -146,7 +141,7 @@ def hexstr_to_cbits( in_str):
 
 #-----------------------------------
 def int_to_hexstr( in_integer):
-  return  hex( in_integer)
+    return  hex( in_integer)
   
 ##========================================================
 #--------------
@@ -212,18 +207,17 @@ def setup():
 
       ln0_height      =  ln0_height.strip()
       ln1_blockhash   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
-      ln2_subsidy     =  bitstxt_fd.readline().strip()
-      ln3_totalfee    =  bitstxt_fd.readline().strip()
-      ln4_time        =  bitstxt_fd.readline().strip()
-      ln5_mediantime  =  bitstxt_fd.readline().strip()
+      ln2_cbits       =  bitstxt_fd.readline().strip()
+      ln3_difficulty  =  bitstxt_fd.readline().strip()
+      ln4_chainwork   =  bitstxt_fd.readline().strip()
 
-      local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time )
-      print('local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time )')
+      local_row = (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork )
+      print('local_row (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork)')
       print(str(local_row))
       g_bits_rows.append(local_row)
 
-    print( "str(g_bits_rows)")
-    print( str(g_bits_rows))
+    #print( "str(g_bits_rows)")
+    #print( str(g_bits_rows))
   
     return
     # done setup()
