@@ -361,7 +361,7 @@ def write_block_bits_row( in_row ):
   try:
     t_SQL = "insert into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
     gcurs.execute( t_SQL,
-        (block_bits_row[0],block_bits_row[1],block_bits_row[2],block_bits_row[3],block_bits_row[4]))
+        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4]))
     gconn.commit()
   except Exception, E:
     print(str(E))
