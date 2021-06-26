@@ -223,7 +223,7 @@ def setup():
 
     print( "str(g_bits_rows)")
     print( str(g_bits_rows))
-    exit
+  
     return
     # done setup()
 
