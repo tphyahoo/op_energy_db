@@ -171,54 +171,8 @@ def setup():
         print str(E)
         exit(1)
 
-    ##-----------------------------------------------------------------
-    ##  import first info file -- blockbits -- 
-    ##   ref.  bitcoin-cli getblockstats $HEIGHT
-    ##   ( height, blockhash, bits, difficulty, chainwork )
-    init_ibr_SQL = '''
-    DROP table if exists in_bits_raw cascade;
-    CREATE TABLE public.in_bits_raw (
-      height_str text PRIMARY KEY,
-      hash_str text,
-      cbits_str text,
-      difficulty_str text,
-      chainwork_str text
-    );
-    '''
-    try:
-      comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
-      gcurs.execute( init_ibr_SQL )
-      gcurs.execute( comment_SQL )
-      gconn.commit()
-    except Exception, E:
-      print(str(E))
-    ## -----------------------------------------------
-    try:
-      infile_name = 'blockbits.txt'
-      bitstxt_fd = open( _dst_ddir+infile_name, 'r' )
-    except Exception, E:
-      print( str(E) )
-      exit(1)
-
-    while True:
-      ln0_height = bitstxt_fd.readline()
-      if (cmp( ln0_height, '') == 0):
-          break
-
-      ln0_height      =  ln0_height.strip()
-      ln1_blockhash   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
-      ln2_cbits       =  fix_quoted_numbers( bitstxt_fd.readline().strip() )
-      ln3_difficulty  =  bitstxt_fd.readline().strip()
-      ln4_chainwork   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
-
-      local_row = (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork )
-      print('local_row (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork)')
-      print(str(local_row))
-      g_bits_rows.append(local_row)
-
-    #print( "str(g_bits_rows)")
-    #print( str(g_bits_rows))
-  
+    do_import_bbits()
+    
     return
     # done setup()
 
@@ -287,6 +241,9 @@ def do_import_bstats():
   return
 
 #-------------------------------------------------------------
+#  get_block_bits_row
+#   
+#
 def get_block_bits_row( in_height ):
   ## request a row as 1-based $HEIGHT
   local_height = len(g_bits_rows)
@@ -301,17 +258,65 @@ def get_block_bits_row( in_height ):
 
 #-------------------------------------------------------------
 #
-#  TOP Level Design is:   
-#   this function will get called every time the tool is run
-#   check if an update is needed?  if no update needed, just return
-#   If an update is needed, call function get_block_bits_row()
-#    to get the row, INSERT the row, done
-#
 
 def do_import_bbits():
-  global _test_mode
-  global gcurs, gconn
+    global _test_mode, g_bits_rows
+    global gcurs, gconn
 
+    ##-----------------------------------------------------------------
+    ##  import first info file -- blockbits -- 
+    ##   ref.  bitcoin-cli getblockstats $HEIGHT
+    ##   ( height, blockhash, bits, difficulty, chainwork )
+    init_ibr_SQL = '''
+    DROP table if exists in_bits_raw cascade;
+    CREATE TABLE public.in_bits_raw (
+      height_str text PRIMARY KEY,
+      hash_str text,
+      cbits_str text,
+      difficulty_str text,
+      chainwork_str text
+    );
+    '''
+    try:
+      comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
+      gcurs.execute( init_ibr_SQL )
+      gcurs.execute( comment_SQL )
+      gconn.commit()
+    except Exception, E:
+      print(str(E))
+    ## -----------------------------------------------
+    try:
+      infile_name = 'blockbits.txt'
+      bitstxt_fd = open( _dst_ddir+infile_name, 'r' )
+    except Exception, E:
+      print( str(E) )
+      exit(1)
+
+    while True:
+      ln0_height = bitstxt_fd.readline()
+      if (cmp( ln0_height, '') == 0):
+          break
+
+      ln0_height      =  ln0_height.strip()
+      ln1_blockhash   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
+      ln2_cbits       =  fix_quoted_numbers( bitstxt_fd.readline().strip() )
+      ln3_difficulty  =  bitstxt_fd.readline().strip()
+      ln4_chainwork   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
+
+      local_row = (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork )
+      print('local_row (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork)')
+      print(str(local_row))
+      g_bits_rows.append(local_row)
+
+    #print( "str(g_bits_rows)")
+    #print( str(g_bits_rows))
+    bitstxt_fd.close()
+
+    return
+
+tmp999 = '''
+
+  ##-------------
   try:
     rdF = open( _dst_ddir+'blockbits.txt', 'r' )
   except Exception, E:
@@ -342,9 +347,7 @@ def do_import_bbits():
 
   gconn.commit()
 
-
-  return
-
+'''
 ##----------------------------------------
 def do_next_block():
     global g_height_imported
@@ -364,6 +367,11 @@ def do_next_block():
     ##  -- INSERT data
     ##        insert row into raw tables (for sanity / logging)
     ##----------------
+    # check if an update is needed?  if no update needed, just return
+    # If an update is needed, 
+    #   row = get_block_bits_row()
+    #   INSERT the row, done
+
     ##---------------------------------------------
 
     if (g_height_imported > 0):
