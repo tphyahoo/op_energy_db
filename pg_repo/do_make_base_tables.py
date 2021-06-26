@@ -391,7 +391,6 @@ def do_next_block():
         return   # nothing to do
     
     ## update global row list and counter
-    g_bits_rows.append( block_bits_row)
     g_height_imported = g_height_imported + 1
 
     #
