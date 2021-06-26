@@ -143,10 +143,11 @@ def hexstr_to_cbits( in_str):
 def int_to_hexstr( in_integer):
     return  hex( in_integer)
   
-##========================================================
-#--------------
+##======================================================================
+
 def setup():
-    # establish a PG connection using credentials passed by ENV
+    # Called once at program startup time
+    #  - establish a PG connection using credentials passed by ENV
     global gcurs, gconn, _src_ddir
 
     conn_string = "host={} port={} dbname={} user={} password={}".format(
@@ -172,26 +173,11 @@ def setup():
         exit(1)
 
     do_import_bbits()
+    #do_import_bstats()
+    #do_make_data_chain()
     
     return
     # done setup()
-
-#-------------------------------------------------------------
-#  get_block_bits_row
-#   
-#
-def get_block_bits_row( in_height ):
-  ## request a row as 1-based $HEIGHT
-  local_height = len(g_bits_rows)
-
-  if (in_height < local_height):
-    res_data = g_bits_rows[in_height-1]  # 0-based index here
-  else:
-    res_data = None
-
-  print(' in_height :'+str(in_height)+'; local_height:'+str(local_height))
-  print(' '+str(res_data))
-  return res_data
 
 
 #-------------------------------------------------------------
@@ -349,7 +335,39 @@ def do_import_bstats():
       print(str(E))
 
   return
-  
+
+
+#-------------------------------------------------------------
+#  get_block_bits_row
+#   
+#
+def get_block_bits_row( in_height ):
+  ## request a row as 1-based $HEIGHT
+  local_height = len(g_bits_rows)
+
+  if (in_height < local_height):
+    res_data = g_bits_rows[in_height-1]  # 0-based index here
+  else:
+    res_data = None
+
+  print(' in_height :'+str(in_height)+'; local_height:'+str(local_height))
+  print(' '+str(res_data))
+  return res_data
+
+#----------------------------------------------------------------
+def write_block_bits_row( in_row ):
+
+  #-----------
+  try:
+    t_SQL = "insert into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
+    gcurs.execute( t_SQL,
+        (block_bits_row[0],block_bits_row[1],block_bits_row[2],block_bits_row[3],block_bits_row[4]))
+    gconn.commit()
+  except Exception, E:
+    print(str(E))
+
+  return 
+
 ##----------------------------------------
 def do_next_block():
     global g_height_imported
@@ -390,17 +408,12 @@ def do_next_block():
         print('DEBUG loop - nothing to do')
         return   # nothing to do
     
+    ## record the new block row
+    write_block_bits_row( block_bits_row)
+
     ## update global row list and counter
     g_height_imported = g_height_imported + 1
 
-    #
-    try:
-      t_SQL = "insert into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
-      gcurs.execute( t_SQL,
-        (block_bits_row[0],block_bits_row[1],block_bits_row[2],block_bits_row[3],block_bits_row[4]))
-      gconn.commit()
-    except Exception, E:
-      print(str(E))
 
     ##------------------------
     print('DEBUG loop - exit')
