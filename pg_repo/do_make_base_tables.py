@@ -288,10 +288,11 @@ def do_import_bstats():
 
 #-------------------------------------------------------------
 def get_block_bits_row( in_height ):
+  ## request a row as 1-based $HEIGHT
   local_height = len(g_bits_rows)
 
-  if local_height > in_height :
-    res_data = g_bits_rows[in_height]
+  if (in_height < local_height):
+    res_data = g_bits_rows[in_height-1]  # 0-based index here
   else:
     res_data = None
 
