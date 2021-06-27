@@ -176,7 +176,7 @@ def setup():
 
     do_import_bbits()
     do_import_bstats()
-    #do_make_data_chain()
+    do_make_data_chain()
 
     return
     # done setup()
@@ -321,11 +321,7 @@ def do_import_bstats():
     ln3_totalfee    =  bitstats_fd.readline().strip()
     ln4_time        =  bitstats_fd.readline().strip()
     ln5_mediantime  =  bitstats_fd.readline().strip()
-    #print ln4
-    #gcurs.execute( t_SQL,
-    # (ln0_height, ln1_blockhash, ln2_subsidy, ln3_totalfee, ln4_time, ln5_mediantime))
-    #if (  int(ln0_height) % 1000 == 0):
-    #  gconn.commit()
+
     local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)
     if _verbose: print('(ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)')
     if _verbose: print(str(local_row))
@@ -334,12 +330,6 @@ def do_import_bstats():
   if _verbose: print( "str(g_stats_rows)")
   if _verbose: print( str(g_stats_rows))
   bitstats_fd.close()
-  #gconn.commit()
-  #try:
-  #    gcurs.execute( end_SQL )
-  #    gconn.commit()
-  #except Exception, E:
-  #    print(str(E))
 
   return
 
@@ -411,6 +401,86 @@ def write_block_stats_row( in_row ):
   if _verbose: print('  write_block_stats_row')
   return
 
+
+##----------------------------------------
+
+def do_make_data_chain():
+    global _test_mode, g_bits_rows
+    global gcurs, gconn
+
+    ##-----------------------------------------------------------------
+    init_dc_SQL = '''
+    DROP table if exists data_chain cascade;
+    CREATE TABLE public.data_chain (
+      blockheight integer PRIMARY KEY,
+      blockhash text,
+      compact_bits_hex text,
+      difficulty float,
+      chainwork_hex text,
+      chain_reward text,
+      chain_subsidy text,
+      chain_totalfee text,
+      median_time text,
+      block_time text
+    );
+    '''
+    try:
+      comment_SQL = "COMMENT ON TABLE public.data_chain IS '-v0-0';"
+      gcurs.execute( init_dc_SQL )
+      gcurs.execute( comment_SQL )
+      gconn.commit()
+    except Exception, E:
+      print(str(E))
+    ## -----------------------------------------------
+ 
+ t988 = '''
+create table data_chain as (
+      SELECT b.height_str::integer           as blockheight,
+            fix_quoted_numbers(b.hash_str)   as blockhash,
+            uintstr_to_hexstr(cbits_str)      as compact_bits_hex,
+            b.difficulty_str::float          as difficulty,
+            uintstr_to_hexstr(chainwork_str) as chainwork_hex,
+            0::bigint as chain_reward,   -- derive this, remove in_btc_raw
+            0::bigint as chain_subsidy,
+            0::bigint as chain_totalfee,
+            in_stats_raw.median_time_str::integer as median_time,
+            in_stats_raw.block_time_str::integer  as block_time
+      FROM public.in_bits_raw as b
+      LEFT JOIN
+        in_stats_raw on (b.height_str = in_stats_raw.height_str)
+
+'''
+
+##----------------------------------------
+def do_make_data_chain_row( in_bits, in_stats):
+  ## - 
+
+    insert_dc_SQL = '''
+    INSERT into TABLE public.data_chain 
+    SELECT (b.height_str::integer           as blockheight,
+            fix_quoted_numbers(b.hash_str)   as blockhash,
+            uintstr_to_hexstr(cbits_str)      as compact_bits_hex,
+            b.difficulty_str::float          as difficulty,
+            uintstr_to_hexstr(chainwork_str) as chainwork_hex,
+            0::bigint as chain_reward,   -- derive this, remove in_btc_raw
+            0::bigint as chain_subsidy,
+            0::bigint as chain_totalfee,
+            in_stats_raw.median_time_str::integer as median_time,
+            in_stats_raw.block_time_str::integer  as block_time
+      FROM public.in_bits_raw as b
+      LEFT JOIN
+        in_stats_raw on (b.height_str = in_stats_raw.height_str)
+      WHERE b.height_str::integer == %s
+    '''
+    try:
+      gcurs.execute( insert_dc_SQL, int(in_bits[0]) )
+      gconn.commit()
+    except Exception, E:
+      print(str(E))
+
+  if _verbose: print("  do_make_data_chain_row")
+  return
+
 ##----------------------------------------
 def do_next_block():
     global g_height_imported
@@ -457,6 +527,9 @@ def do_next_block():
     ## get and record a stats row, may require the hash value from step1
     block_stats_row = get_block_stats_row( g_height_imported+1 )
     write_block_stats_row( block_stats_row)
+
+    ## calc and write data_chain row
+    do_make_data_chain_row( block_bits_row, block_stats_row )
 
     ## update global row list and counter
     g_height_imported = g_height_imported + 1
