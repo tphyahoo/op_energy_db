@@ -174,7 +174,7 @@ def setup():
         exit(1)
 
     do_import_bbits()
-    #do_import_bstats()
+    do_import_bstats()
     #do_make_data_chain()
 
     return
@@ -277,13 +277,10 @@ tmp999 = '''
 #  read and store a text datafile in custom format
 #   rely on table definition in the template; may change
 def do_import_bstats():
-
   global _test_mode
   global gcurs, gconn
 
-  t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
-
-  init_SQL = '''
+  init_stats_SQL = '''
   DROP table if exists public.in_stats_raw cascade;
   CREATE TABLE public.in_stats_raw (
     height_str text PRIMARY KEY,
@@ -294,46 +291,56 @@ def do_import_bstats():
     median_time_str text
   )
   '''
-  end_SQL = "COMMENT ON TABLE public.in_stats_raw IS 'import blockstats.txt from datafetch 12nov20';"
-  ##--
-
+  comment_SQL = "COMMENT ON TABLE public.in_stats_raw IS 'import blockstats.txt from datafetch 12nov20';"
+  ##-=
   try:
-    gcurs.execute( init_SQL )
+    gcurs.execute( init_stats_SQL )
+    gcurs.execute( comment_SQL )
+    gconn.commit()
   except Exception, E:
     print(str(E))
-  gconn.commit()
-
+  ##-----------------------------------------------------------------
+  ## open a demo datafile-- blockstats -
   ## see  bitcoin-cli getblockstats $HEIGHT
   ## height, blockhash, subsidy, totalfee, time, mediantime
   try:
-    rdF = open( _dst_ddir+'blockstats.txt', 'r' )
+    bitstats_fd = open( _dst_ddir+'blockstats.txt', 'r' )
   except Exception, E:
     print( str(E) )
     exit(1)
 
+  t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
+
   while True:
-    ln0_height = rdF.readline()
+    ln0_height = bitstats_fd.readline()
     if (cmp( ln0_height, '') == 0):
         break
 
     ln0_height      =  ln0_height.strip()
-    ln1_blockhash   =  rdF.readline().strip()
-    ln2_subsidy     =  rdF.readline().strip()
-    ln3_totalfee    =  rdF.readline().strip()
-    ln4_time        =  rdF.readline().strip()
-    ln5_mediantime  =  rdF.readline().strip()
+    ln1_blockhash   =  bitstats_fd.readline().strip()
+    ln2_subsidy     =  bitstats_fd.readline().strip()
+    ln3_totalfee    =  bitstats_fd.readline().strip()
+    ln4_time        =  bitstats_fd.readline().strip()
+    ln5_mediantime  =  bitstats_fd.readline().strip()
     #print ln4
-    gcurs.execute( t_SQL,
-      (ln0_height, ln1_blockhash, ln2_subsidy, ln3_totalfee, ln4_time, ln5_mediantime))
-    if (  int(ln0_height) % 1000 == 0):
-      gconn.commit()
+    #gcurs.execute( t_SQL,
+    # (ln0_height, ln1_blockhash, ln2_subsidy, ln3_totalfee, ln4_time, ln5_mediantime))
+    #if (  int(ln0_height) % 1000 == 0):
+    #  gconn.commit()
+    local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)
+    if _verbose: print('(ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)')
+    if _verbose: print(str(local_row))
+    g_bits_rows.append(local_row)
 
-  gconn.commit()
-  try:
-      gcurs.execute( end_SQL )
-      gconn.commit()
-  except Exception, E:
-      print(str(E))
+  if _verbose: print( "str(g_bits_rows)")
+  if _verbose: print( str(g_bits_rows))
+  bitstats_fd.close()
+  #gconn.commit()
+  #try:
+  #    gcurs.execute( end_SQL )
+  #    gconn.commit()
+  #except Exception, E:
+  #    print(str(E))
 
   return
 
