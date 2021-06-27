@@ -182,7 +182,7 @@ def setup():
     ##- initialize from known data
     do_import_bbits()
     do_import_bstats()
-    do_make_data_chain()
+    do_init_data_chain()
 
     return
     # done setup()
@@ -333,6 +333,13 @@ def do_import_bstats():
     if _verbose: print(str(local_row))
     g_stats_rows.append(local_row)
 
+    ## update aggregate totals
+    fee = int(ln3_totalfee)
+    subsidy = int(ln2_subsidy)
+    g_chainreward = g_chainreward + fee + subsidy
+    g_chainfee = g_chainfee + fee
+    g_chainsubsidy = g_chainsubsidy + subsidy
+
   if _verbose: print( "str(g_stats_rows)")
   if _verbose: print( str(g_stats_rows))
   bitstats_fd.close()
@@ -410,9 +417,14 @@ def write_block_stats_row( in_row ):
 
 ##----------------------------------------
 
-def do_make_data_chain():
+def do_init_data_chain():
+    global g_chainreward, g_chainfee, g_chainsubsidy
     global _test_mode, g_bits_rows
     global gcurs, gconn
+
+    g_chainreward   = 0L
+    g_chainfee      = 0L
+    g_chainsubsidy  = 0L
 
     ##-----------------------------------------------------------------
     init_dc_SQL = '''
@@ -469,9 +481,9 @@ def do_make_data_chain_row( in_bits, in_stats):
             cbits_str ,
             b.difficulty_str::float ,
             chainwork_str ,
-            0::bigint ,   -- derive this, remove in_btc_raw
-            0::bigint ,
-            0::bigint ,
+            %s ,   -- derive this, remove in_btc_raw
+            %s ,
+            %s ,
             in_stats_raw.median_time_str::integer ,
             in_stats_raw.block_time_str::integer
       FROM public.in_bits_raw as b
@@ -479,14 +491,14 @@ def do_make_data_chain_row( in_bits, in_stats):
         in_stats_raw on (b.height_str = in_stats_raw.height_str)
       WHERE b.height_str LIKE %s
     '''
-
     try:
       tkey = in_bits[0]
-      gcurs.execute( insert_dc_SQL, ( tkey,) )
+      gcurs.execute( insert_dc_SQL, ( g_chainreward, g_chainsubsidy, g_chainfee, tkey ) )
       gconn.commit()
     except Exception, E:
       print(str(E))
 
+    ##-------------------
     if _verbose: print("  do_make_data_chain_row")
     return
 
