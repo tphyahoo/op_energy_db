@@ -310,8 +310,6 @@ def do_import_bstats():
     print( str(E) )
     exit(1)
 
-  t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
-
   while True:
     ln0_height = bitstats_fd.readline()
     if (cmp( ln0_height, '') == 0):
@@ -362,6 +360,27 @@ def get_block_bits_row( in_height ):
   if _verbose: print(' '+str(res_data))
   return res_data
 
+
+
+#-------------------------------------------------------------
+#  get_block_stats_row
+#
+def get_block_stats_row( in_height ):
+  ## request a row as 1-based $HEIGHT
+  local_height = len(g_stats_rows)
+
+  if (in_height < local_height):
+    res_data = g_stats_rows[in_height-1]  # 0-based index here
+  else:
+    res_data = None
+
+  if _verbose: print(' get_block_stats_row:')
+  if _verbose: print('  in_height :'+str(in_height)+'; local_height:'+str(local_height))
+  if _verbose: print(' '+str(res_data))
+  return res_data
+
+
+
 #----------------------------------------------------------------
 def write_block_bits_row( in_row ):
 
@@ -375,6 +394,21 @@ def write_block_bits_row( in_row ):
     print(str(E))
 
   if _verbose: print('  write_block_bits_row')
+  return
+
+#----------------------------------------------------------------
+def write_block_stats_row( in_row ):
+
+  #-----------
+  try:
+    t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
+    gcurs.execute( t_SQL,
+        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4],in_row[5]))
+    gconn.commit()
+  except Exception, E:
+    print(str(E))
+
+  if _verbose: print('  write_block_stats_row')
   return
 
 ##----------------------------------------
@@ -420,9 +454,12 @@ def do_next_block():
     ## record the new block row
     write_block_bits_row( block_bits_row)
 
+    ## get and record a stats row, may require the hash value from step1
+    block_stats_row = get_block_stats_row( g_height_imported+1 )
+    write_block_stats_row( block_stats_row)
+
     ## update global row list and counter
     g_height_imported = g_height_imported + 1
-
 
     ##------------------------
     if _verbose: print('DEBUG loop - exit')
