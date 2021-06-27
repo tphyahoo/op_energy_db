@@ -334,20 +334,6 @@ def do_import_bstats():
     if _verbose: print(str(local_row))
     g_stats_rows.append(local_row)
 
-    ## update aggregate totals
-    fee = int(ln3_totalfee)
-    subsidy = int(ln2_subsidy)
-    g_chainreward = g_chainreward + fee + subsidy
-    g_chainfee = g_chainfee + fee
-    g_chainsubsidy = g_chainsubsidy + subsidy
-
-    if _verbose:
-      print( '  aggregate totals:')
-      print( '  '+str(type(fee))+' '+str(fee)  )
-      print( '  '+str(type(subsidy))+' '+str(subsidy)  )
-      print( '  '+str(type(g_chainreward))+' '+str(g_chainreward)  )
-      print( '  '+str(type(g_chainfee))+' '+str(g_chainfee)  )
-      print( '  '+str(type(g_chainsubsidy))+' '+str(g_chainsubsidy)  )
 
   if _verbose: print( "str(g_stats_rows)")
   #if _verbose: print( str(g_stats_rows))
@@ -482,6 +468,21 @@ create table data_chain as (
 ##----------------------------------------
 def do_make_data_chain_row( in_bits, in_stats):
     global g_chainreward, g_chainfee, g_chainsubsidy
+
+    ## update aggregate totals
+    fee = int(in_stats[3])       # ln3_totalfee)
+    subsidy = int(in_stats[2])   # ln2_subsidy)
+    g_chainreward = g_chainreward + fee + subsidy
+    g_chainfee = g_chainfee + fee
+    g_chainsubsidy = g_chainsubsidy + subsidy
+
+    if _verbose:
+      print( '  aggregate totals:')
+      print( '  '+str(type(fee))+' '+str(fee)  )
+      print( '  '+str(type(subsidy))+' '+str(subsidy)  )
+      print( '  '+str(type(g_chainreward))+' '+str(g_chainreward)  )
+      print( '  '+str(type(g_chainfee))+' '+str(g_chainfee)  )
+      print( '  '+str(type(g_chainsubsidy))+' '+str(g_chainsubsidy)  )
 
     ## - SQL data_chain  uses tables already in place
     insert_dc_SQL = '''
