@@ -240,7 +240,7 @@ def do_import_bbits():
       g_bits_rows.append(local_row)
 
     if _verbose: print( "str(g_bits_rows)")
-    if _verbose: print( str(g_bits_rows))
+    #if _verbose: print( str(g_bits_rows))
     bitstxt_fd.close()
 
     return
@@ -341,8 +341,16 @@ def do_import_bstats():
     g_chainfee = g_chainfee + fee
     g_chainsubsidy = g_chainsubsidy + subsidy
 
+    if _verbose:
+      print( '  aggregate totals:')
+      print( '  '+str(type(fee))+' '+str(fee)  )
+      print( '  '+str(type(subsidy))+' '+str(subsidy)  )
+      print( '  '+str(type(g_chainreward))+' '+str(g_chainreward)  )
+      print( '  '+str(type(g_chainfee))+' '+str(g_chainfee)  )
+      print( '  '+str(type(g_chainsubsidy))+' '+str(g_chainsubsidy)  )
+
   if _verbose: print( "str(g_stats_rows)")
-  if _verbose: print( str(g_stats_rows))
+  #if _verbose: print( str(g_stats_rows))
   bitstats_fd.close()
 
   return
@@ -423,24 +431,25 @@ def do_init_data_chain():
     global _test_mode, g_bits_rows
     global gcurs, gconn
 
-    g_chainreward   = 0L
-    g_chainfee      = 0L
-    g_chainsubsidy  = 0L
+    ## odd-but-true, sums here have been pre-initialized; may change
+    #g_chainreward   = 0L
+    #g_chainfee      = 0L
+    #g_chainsubsidy  = 0L
 
     ##-----------------------------------------------------------------
     init_dc_SQL = '''
     DROP table if exists data_chain cascade;
     CREATE TABLE public.data_chain (
       blockheight integer PRIMARY KEY,
-      blockhash text,
-      compact_bits_hex text,
-      difficulty float,
-      chainwork_hex text,
-      chain_reward text,
-      chain_subsidy text,
-      chain_totalfee text,
-      median_time text,
-      block_time text
+      blockhash text         ,
+      compact_bits_hex text  ,
+      difficulty float       ,
+      chainwork_hex text     ,
+      chain_reward   bigint  ,
+      chain_subsidy  bigint  ,
+      chain_totalfee bigint  ,
+      median_time    integer ,
+      block_time     integer
     );
     '''
     try:
@@ -454,11 +463,11 @@ def do_init_data_chain():
 
 t988 = '''
 create table data_chain as (
-      SELECT b.height_str::integer           as blockheight,
-            fix_quoted_numbers(b.hash_str)   as blockhash,
-            uintstr_to_hexstr(cbits_str)      as compact_bits_hex,
-            b.difficulty_str::float          as difficulty,
-            uintstr_to_hexstr(chainwork_str) as chainwork_hex,
+      SELECT b.height_str::integer                as blockheight,
+            fix_quoted_numbers(b.hash_str)        as blockhash,
+            uintstr_to_hexstr(cbits_str)          as compact_bits_hex,
+            b.difficulty_str::float               as difficulty,
+            uintstr_to_hexstr(chainwork_str)      as chainwork_hex,
             0::bigint as chain_reward,   -- derive this, remove in_btc_raw
             0::bigint as chain_subsidy,
             0::bigint as chain_totalfee,
@@ -501,6 +510,7 @@ def do_make_data_chain_row( in_bits, in_stats):
 
     ##-------------------
     if _verbose: print("  do_make_data_chain_row")
+    if _verbose: print(  '   '+str(( g_chainreward, g_chainsubsidy, g_chainfee, tkey )) )
     return
 
 
