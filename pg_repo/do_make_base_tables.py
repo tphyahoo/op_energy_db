@@ -522,6 +522,7 @@ def do_next_block():
     block_bits_row = get_block_bits_row( g_height_imported+1 )
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
+        time.sleep(1)
         return   # nothing to do
 
     ## record the new block row
@@ -556,7 +557,7 @@ def do_main_loop():
         #do_import_bstats()
 
         #do_make_datachain()
-        time.sleep(1)
+        #time.sleep(1)
 
 
     ## done
