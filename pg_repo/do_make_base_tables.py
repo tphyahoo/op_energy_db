@@ -47,10 +47,15 @@ g_all_imports = {
 }
 
 ## tip of the local data_chain
-g_height_imported = 0
+g_height_imported = 0  # count of imported rows
 
-g_bits_rows  = []  # empty list, ready for tuples
-g_stats_rows = [] 
+g_bits_rows  = []  # empty list of response tuples
+g_stats_rows = []  #
+
+g_chainreward  = 0L  #bigInt
+g_chainfee     = 0L
+g_chainsubsidy = 0L
+
 
 ##========================================================
 ##  utils section
@@ -174,6 +179,7 @@ def setup():
         print str(E)
         exit(1)
 
+    ##- initialize from known data
     do_import_bbits()
     do_import_bstats()
     do_make_data_chain()
@@ -453,14 +459,15 @@ create table data_chain as (
 
 ##----------------------------------------
 def do_make_data_chain_row( in_bits, in_stats):
-    ## -
+    global g_chainreward, g_chainfee, g_chainsubsidy
 
+    ## - SQL data_chain  uses tables already in place
     insert_dc_SQL = '''
     INSERT into  public.data_chain
-    SELECT b.height_str::integer        ,
-            b.hash_str  ,
-            cbits_str  ,
-            b.difficulty_str::float       ,
+    SELECT b.height_str::integer ,
+            b.hash_str ,
+            cbits_str ,
+            b.difficulty_str::float ,
             chainwork_str ,
             0::bigint ,   -- derive this, remove in_btc_raw
             0::bigint ,
@@ -490,23 +497,18 @@ def do_next_block():
 
     ##  TEST current $HEIGHT up to date?
     ##
-    ##  -- get highest block in_bit_raw  (already known)
+    ##  -- get highest block already known
     ##
     ##  -- ask for $HEIGHT+1
-    ##  --   if EMPTY return else
-    ##         if text file  else
+    ##  --   if EMPTY return
+    ##         if text file
     ##              extract rows for $HEIGHT+1 from textfile
     ##
-    ##  --     blockchain, look for that block+1, with 100 confirmations.
+    ##  --     else blockchain, look for that block+1, with 100 confirmations.
     ##            (for both scripts) (stats and bits)
     ##
     ##  -- INSERT data
     ##        insert row into raw tables (for sanity / logging)
-    ##----------------
-    # check if an update is needed?  if no update needed, just return
-    # If an update is needed,
-    #   row = get_block_bits_row()
-    #   INSERT the row, done
 
     ##---------------------------------------------
 
@@ -519,10 +521,12 @@ def do_next_block():
         #g_height_imported = gcurs.fetchone()[0]
         print( str(g_height_imported))
 
+    ## ask for a new block row
+    ##   if none, sleep and return
     block_bits_row = get_block_bits_row( g_height_imported+1 )
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
-        time.sleep(1)
+        time.sleep(10)
         return   # nothing to do
 
     ## record the new block row
@@ -539,7 +543,7 @@ def do_next_block():
     g_height_imported = g_height_imported + 1
 
     ##------------------------
-    if _verbose: print('DEBUG loop - exit')
+    if _verbose: print('DEBUG  loop - returns')
     return
 
 
@@ -551,12 +555,6 @@ def do_main_loop():
 
         do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
-        #if _test_mode:
-        #  exit(0)
-
-        #do_import_bstats()
-
-        #do_make_datachain()
         #time.sleep(1)
 
 
