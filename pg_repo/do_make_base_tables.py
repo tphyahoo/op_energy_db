@@ -316,7 +316,7 @@ def do_import_bstats():
         break
 
     ln0_height      =  ln0_height.strip()
-    ln1_blockhash   =  bitstats_fd.readline().strip()
+    ln1_blockhash   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
     ln2_subsidy     =  bitstats_fd.readline().strip()
     ln3_totalfee    =  bitstats_fd.readline().strip()
     ln4_time        =  bitstats_fd.readline().strip()
