@@ -284,6 +284,7 @@ tmp999 = '''
 #  read and store a text datafile in custom format
 #   rely on table definition in the template; may change
 def do_import_bstats():
+  global g_chainreward, g_chainfee, g_chainsubsidy
   global _test_mode, g_stats_rows
   global gcurs, gconn
 
