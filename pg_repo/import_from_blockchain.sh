@@ -27,9 +27,11 @@ export PG_REPO
 
 ## look for command line options
 export VERBOSE='false'
-export SDEBUG='false'
-while getopts ':dv' flag; do
+export  SDEBUG='false'
+export  SCLEAN='false'
+while getopts ':cdv' flag; do
   case "${flag}" in
+    c) SCLEAN='true' ;;
     d) SDEBUG='true' ;;
     v) VERBOSE='true' ;;
   esac
@@ -45,7 +47,6 @@ done
 export SRC_DDIR=/var/local/opdev/
 
 if [[ ${SDEBUG} == 'true' ]]; then
-  #echo "SDEBUG = true"
   SRC_DATAFILE=btcdata_1600585200_small.tgz
 else
   SRC_DATAFILE=btcdata_1600585200.tgz
@@ -80,8 +81,7 @@ export PGPASSWORD=opdev
 
 ## db init requires a postgresql role w/ credentials
 ##  and must install plpython3
-## TODO this test is flawed - fixme w/ getopts?
-#if [[ -z $1 ]] && [[ $1 == '-d' ]]; then
+#if [[ ${SCLEAN} == 'true'  ]]; then
 #    psql -c "drop database ${PGDATABASE}"
 #fi
 
