@@ -49,7 +49,8 @@ g_all_imports = {
 ## tip of the local data_chain
 g_height_imported = 0
 
-g_bits_rows = []  # empty list, ready for tuples
+g_bits_rows  = []  # empty list, ready for tuples
+g_stats_rows = [] 
 
 ##========================================================
 ##  utils section
@@ -277,7 +278,7 @@ tmp999 = '''
 #  read and store a text datafile in custom format
 #   rely on table definition in the template; may change
 def do_import_bstats():
-  global _test_mode
+  global _test_mode, g_stats_rows
   global gcurs, gconn
 
   init_stats_SQL = '''
@@ -330,10 +331,10 @@ def do_import_bstats():
     local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)
     if _verbose: print('(ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)')
     if _verbose: print(str(local_row))
-    g_bits_rows.append(local_row)
+    g_stats_rows.append(local_row)
 
-  if _verbose: print( "str(g_bits_rows)")
-  if _verbose: print( str(g_bits_rows))
+  if _verbose: print( "str(g_stats_rows)")
+  if _verbose: print( str(g_stats_rows))
   bitstats_fd.close()
   #gconn.commit()
   #try:
