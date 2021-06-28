@@ -471,6 +471,7 @@ def do_make_data_chain_row( in_bits, in_stats):
 ##----------------------------------------
 def do_next_block():
     global gcurs, gconn
+    global g_chainreward, g_chainfee, g_chainsubsidy
     global _verbose, g_height_imported
 
     ##  TEST current $HEIGHT up to date?
