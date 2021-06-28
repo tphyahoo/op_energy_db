@@ -593,8 +593,7 @@ def do_main_loop():
       highest_block_in_pgdb = gcurs.fetchone()[0]
       if _verbose: print('highest_block_in_pgdb: '+str(highest_block_in_pgdb))
 
-      if next_block:
-          insert_block_pgdb( a, b, c, d, e )
+      do_next_block( a, b, c, d, e )
       #do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
       #time.sleep(1)
