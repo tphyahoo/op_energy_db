@@ -584,7 +584,8 @@ def do_main_loop():
     while True:
 
       try:
-        qry_SQL = 'with rows as (SELECT blockheight as height from data_chain) SELECT max(rows.height) from rows'
+        qry_SQL = "SELECT max(blockheight) from data_chain"
+        #qry_SQL = 'with rows as (SELECT blockheight as height from data_chain) SELECT max(rows.height) from rows'
         gcurs.execute( qry_SQL )
       except Exception, E:
         print(str(E))
