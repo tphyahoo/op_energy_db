@@ -191,6 +191,7 @@ def setup():
 #-------------------------------------------------------------
 #
 def do_import_bbits():
+    global _verbose
     global _test_mode, g_bits_rows
     global gcurs, gconn
 
@@ -330,6 +331,7 @@ def get_block_bits_row( in_height ):
 #  get_block_stats_row
 #
 def get_block_stats_row( in_height ):
+  global _verbose
   ## request a row as 1-based $HEIGHT
   local_height = len(g_stats_rows)
 
@@ -361,7 +363,7 @@ def write_block_bits_row( in_row ):
 
 #----------------------------------------------------------------
 def write_block_stats_row( in_row ):
-
+  global _verbose
   try:
     t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
     gcurs.execute( t_SQL,
@@ -416,6 +418,7 @@ def do_init_data_chain():
 
 ##----------------------------------------
 def do_make_data_chain_row( in_bits, in_stats):
+    global _verbose
     global g_chainreward, g_chainfee, g_chainsubsidy
 
     ## update aggregate totals
@@ -466,7 +469,7 @@ def do_make_data_chain_row( in_bits, in_stats):
 
 ##----------------------------------------
 def do_next_block():
-    global g_height_imported
+    global g_height_imported, _verbose
 
     ##  TEST current $HEIGHT up to date?
     ##
