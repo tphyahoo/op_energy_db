@@ -470,7 +470,8 @@ def do_make_data_chain_row( in_bits, in_stats):
 
 ##----------------------------------------
 def do_next_block():
-    global g_height_imported, _verbose
+    global gcurs, gconn
+    global _verbose, g_height_imported
 
     ##  TEST current $HEIGHT up to date?
     ##
@@ -529,7 +530,7 @@ def do_next_block():
     try:
       t_bits_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
       gcurs.execute( t_bits_SQL,
-        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4]))
+        (block_bits_row[0],block_bits_row[1],block_bits_row[2],block_bits_row[3],block_bits_row[4]))
       #if _verbose: print('  write_block_bits_row')
 
       ## get and record a stats row, may require the hash value from step1
@@ -537,7 +538,7 @@ def do_next_block():
 
       t_stats_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
       gcurs.execute( t_stats_SQL,
-        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4],in_row[5]))
+        (block_stats_row[0],block_stats_row[1],block_stats_row[2],block_stats_row[3],block_stats_row[4],block_stats_row[5]))
 
       ## calc and write data_chain row
       #do_make_data_chain_row( block_bits_row, block_stats_row )
