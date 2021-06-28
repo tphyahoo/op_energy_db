@@ -495,10 +495,9 @@ def do_next_block( in_blockheight ):
     ##        insert row into raw tables (for sanity / logging)
 
     ##---------------------------------------------
-
-    if ( not in_blockheight > 0):
-        print( 'ERR: '+str(in_blockheight))
-        return
+    ##if ( not in_blockheight > 0):
+    ##    print( 'ERR: '+str(in_blockheight))
+    ##    return
 
     ##=======================================================
     ## MONDAY hack -----
