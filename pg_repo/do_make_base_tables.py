@@ -613,6 +613,9 @@ def do_main_loop():
 
     while True:
 
+      ## init - if there are no data_chain rows yet, MAX() reutrns NULL
+      ##  check for NULL , pass a blockheight = 1  
+      ##  all other cases, pass the MAX known data_chain height
       try:
         qry_SQL = "SELECT max(blockheight) from data_chain"
         #qry_SQL = 'with rows as (SELECT blockheight as height from data_chain) SELECT max(rows.height) from rows'
