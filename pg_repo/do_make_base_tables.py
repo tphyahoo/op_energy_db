@@ -615,6 +615,9 @@ def do_main_loop():
 
       ## init - if there are no data_chain rows yet, MAX() reutrns NULL
       ##  check for NULL , pass a blockheight = 1  
+
+      ## qry the data_chain table, if there are no entries, ask for HEIGHT 1
+
       ##  all other cases, pass the MAX known data_chain height
       try:
         qry_SQL = "SELECT max(blockheight) from data_chain"
