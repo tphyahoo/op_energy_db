@@ -347,37 +347,33 @@ def get_block_stats_row( in_height ):
   return res_data
 
 
-monday-hack-comments = '''
 #----------------------------------------------------------------
-def write_block_bits_row( in_row ):
-  global _verbose
-  try:
-    t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
-    gcurs.execute( t_SQL,
-        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4]))
-    gconn.commit()
-  except Exception, E:
-    print(str(E))
-
-  if _verbose: print('  write_block_bits_row')
-  return
+#def write_block_bits_row( in_row ):
+#  global _verbose
+#  try:
+#    t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
+#    gcurs.execute( t_SQL,
+#        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4]))
+#    gconn.commit()
+#  except Exception, E:
+#    print(str(E))
+#
+#  if _verbose: print('  write_block_bits_row')
+#  return
 
 #----------------------------------------------------------------
-def write_block_stats_row( in_row ):
-  global _verbose
-  try:
-    t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
-    gcurs.execute( t_SQL,
-        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4],in_row[5]))
-    gconn.commit()
-  except Exception, E:
-    print(str(E))
-
-  if _verbose: print('  write_block_stats_row')
-  return
-
-'''
-
+#def write_block_stats_row( in_row ):
+#  global _verbose
+#  try:
+#    t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
+#    gcurs.execute( t_SQL,
+#        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4],in_row[5]))
+#    gconn.commit()
+#  except Exception, E:
+#    print(str(E))
+#
+#  if _verbose: print('  write_block_stats_row')
+#  return
 
 ##----------------------------------------
 def do_make_data_chain_row( in_bits, in_stats):
