@@ -506,42 +506,18 @@ def do_next_block():
         time.sleep(10)
         return   # nothing to do
 
+
     ##=======================================================
     ## MONDAY hack -----
     block_stats_row = get_block_stats_row( g_height_imported+1 )
 
-
     ## record the new block row
     #write_block_bits_row( block_bits_row)
-    try:
-      t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
-      gcurs.execute( t_SQL,
-        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4]))
-      gconn.commit()
-    except Exception, E:
-      print(str(E))
-    if _verbose: print('  write_block_bits_row')
-
-    ## get and record a stats row, may require the hash value from step1
-    #write_block_stats_row( block_stats_row)
-    try:
-      t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
-      gcurs.execute( t_SQL,
-        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4],in_row[5]))
-      gconn.commit()
-    except Exception, E:
-      print(str(E))
-
-    ## calc and write data_chain row
-    #do_make_data_chain_row( block_bits_row, block_stats_row )
-
-    ## update aggregate totals
     fee = int(in_stats[3])       # ln3_totalfee)
     subsidy = int(in_stats[2])   # ln2_subsidy)
     g_chainreward = g_chainreward + fee + subsidy
     g_chainfee = g_chainfee + fee
     g_chainsubsidy = g_chainsubsidy + subsidy
-
     if _verbose:
       print( '  aggregate totals:')
       print( '             fee '+str(type(fee))+' '+str(fee)  )
@@ -550,8 +526,26 @@ def do_next_block():
       print( '      g_chainfee'+str(type(g_chainfee))+' '+hex(g_chainfee)  )
       print( '  g_chainsubsidy'+str(type(g_chainsubsidy))+' '+hex(g_chainsubsidy)  )
 
-    ## - SQL data_chain  uses tables already in place
-    insert_dc_SQL = '''
+    try:
+      t_bits_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
+      gcurs.execute( t_bits_SQL,
+        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4]))
+      #if _verbose: print('  write_block_bits_row')
+
+      ## get and record a stats row, may require the hash value from step1
+      #write_block_stats_row( block_stats_row)
+
+      t_stats_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
+      gcurs.execute( t_stats_SQL,
+        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4],in_row[5]))
+
+      ## calc and write data_chain row
+      #do_make_data_chain_row( block_bits_row, block_stats_row )
+
+      ## update aggregate totals
+
+      ## - SQL data_chain  uses tables already in place
+      insert_dc_SQL = '''
       INSERT into  public.data_chain
       SELECT b.height_str::integer ,
             b.hash_str ,
@@ -568,20 +562,17 @@ def do_next_block():
           in_stats_raw on (b.height_str = in_stats_raw.height_str)
         WHERE b.height_str LIKE %s
       '''
-    try:
-        tkey = in_bits[0]
-        gcurs.execute( insert_dc_SQL, ( g_chainreward, g_chainsubsidy, g_chainfee, tkey ) )
-        gconn.commit()
+      tkey = in_bits[0]
+      gcurs.execute( insert_dc_SQL, ( g_chainreward, g_chainsubsidy, g_chainfee, tkey ) )
+
+      gconn.commit()
     except Exception, E:
         print(str(E))
 
       ## update global row list and counter
       #g_height_imported = g_height_imported + 1
 
-
     ##------------------ end MONDAY hack
-
-
 
 
     ##------------------------
