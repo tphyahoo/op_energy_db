@@ -572,7 +572,7 @@ def do_next_block():
         print(str(E))
 
       ## update global row list and counter
-      #g_height_imported = g_height_imported + 1
+    g_height_imported = g_height_imported + 1
 
     ##------------------ end MONDAY hack
 
