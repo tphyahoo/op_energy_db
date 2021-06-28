@@ -245,40 +245,6 @@ def do_import_bbits():
 
     return
 
-tmp999 = '''
-
-  ##-------------
-  try:
-    rdF = open( _dst_ddir+'blockbits.txt', 'r' )
-  except Exception, E:
-    print( str(E) )
-    exit(1)
-
-  while True:
-    ln0_height = rdF.readline()
-    if (cmp( ln0_height, '') == 0):
-      break
-
-    ln0_height = ln0_height.strip()
-    ln1_hash = rdF.readline().strip()
-    ln2_bits = rdF.readline().strip()
-    ln3_difficulty = rdF.readline().strip()
-    ln4_chainwork = rdF.readline().strip()
-
-    #print ln4
-    t_SQL = "insert into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
-    gcurs.execute( t_SQL,
-      (ln0_height, ln1_hash, ln2_bits, ln3_difficulty, ln4_chainwork))
-    if (  int(ln0_height) % 1000 == 0):
-      gconn.commit()
-
-    if _test_mode:
-      break
-
-
-  gconn.commit()
-
-'''
 
 #-------------------------------------------------------------
 #  read and store a text datafile in custom format
@@ -382,7 +348,6 @@ def get_block_stats_row( in_height ):
 #----------------------------------------------------------------
 def write_block_bits_row( in_row ):
 
-  #-----------
   try:
     t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
     gcurs.execute( t_SQL,
@@ -397,7 +362,6 @@ def write_block_bits_row( in_row ):
 #----------------------------------------------------------------
 def write_block_stats_row( in_row ):
 
-  #-----------
   try:
     t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
     gcurs.execute( t_SQL,
