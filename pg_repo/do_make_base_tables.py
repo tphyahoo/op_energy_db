@@ -349,7 +349,7 @@ def get_block_bits_row( in_height ):
   ## request a row as 1-based $HEIGHT
   local_height = len(g_bits_rows)
 
-  if (in_height < local_height):
+  if (in_height <= local_height):
     res_data = g_bits_rows[in_height-1]  # 0-based index here
   else:
     res_data = None
@@ -367,7 +367,7 @@ def get_block_stats_row( in_height ):
   ## request a row as 1-based $HEIGHT
   local_height = len(g_stats_rows)
 
-  if (in_height < local_height):
+  if (in_height <= local_height):
     res_data = g_stats_rows[in_height-1]  # 0-based index here
   else:
     res_data = None
@@ -445,25 +445,10 @@ def do_init_data_chain():
       gconn.commit()
     except Exception, E:
       print(str(E))
-    ## -----------------------------------------------
 
-t988 = '''
-create table data_chain as (
-      SELECT b.height_str::integer                as blockheight,
-            fix_quoted_numbers(b.hash_str)        as blockhash,
-            uintstr_to_hexstr(cbits_str)          as compact_bits_hex,
-            b.difficulty_str::float               as difficulty,
-            uintstr_to_hexstr(chainwork_str)      as chainwork_hex,
-            0::bigint as chain_reward,   -- derive this, remove in_btc_raw
-            0::bigint as chain_subsidy,
-            0::bigint as chain_totalfee,
-            in_stats_raw.median_time_str::integer as median_time,
-            in_stats_raw.block_time_str::integer  as block_time
-      FROM public.in_bits_raw as b
-      LEFT JOIN
-        in_stats_raw on (b.height_str = in_stats_raw.height_str)
+    ## -----------------
+    return
 
-'''
 
 ##----------------------------------------
 def do_make_data_chain_row( in_bits, in_stats):
@@ -478,11 +463,11 @@ def do_make_data_chain_row( in_bits, in_stats):
 
     if _verbose:
       print( '  aggregate totals:')
-      print( '  '+str(type(fee))+' '+str(fee)  )
-      print( '  '+str(type(subsidy))+' '+str(subsidy)  )
-      print( '  '+str(type(g_chainreward))+' '+str(g_chainreward)  )
-      print( '  '+str(type(g_chainfee))+' '+str(g_chainfee)  )
-      print( '  '+str(type(g_chainsubsidy))+' '+str(g_chainsubsidy)  )
+      print( '             fee '+str(type(fee))+' '+str(fee)  )
+      print( '         subsidy '+str(type(subsidy))+' '+str(subsidy)  )
+      print( '   g_chainreward'+str(type(g_chainreward))+' '+hex(g_chainreward)  )
+      print( '      g_chainfee'+str(type(g_chainfee))+' '+hex(g_chainfee)  )
+      print( '  g_chainsubsidy'+str(type(g_chainsubsidy))+' '+hex(g_chainsubsidy)  )
 
     ## - SQL data_chain  uses tables already in place
     insert_dc_SQL = '''
