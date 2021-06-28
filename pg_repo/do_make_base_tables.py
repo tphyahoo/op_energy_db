@@ -493,12 +493,7 @@ def do_next_block():
     ##---------------------------------------------
 
     if (g_height_imported > 0):
-        #try:
-        #  qry_SQL = 'with rows as (SELECT height_str::integer as height from in_bits_raw) SELECT max(rows.height) from rows'
-        #  gcurs.execute( qry_SQL )
-        #except Exception, E:
-        #  print(str(E))
-        #g_height_imported = gcurs.fetchone()[0]
+
         print( str(g_height_imported))
 
     ## ask for a new block row
@@ -588,9 +583,17 @@ def do_main_loop():
 
     while True:
 
-        do_next_block()  ##- tmp make this work, add bstats+data_chain after
+      try:
+        qry_SQL = 'with rows as (SELECT height_str::integer as height from in_bits_raw) SELECT max(rows.height) from rows'
+        gcurs.execute( qry_SQL )
+      except Exception, E:
+        print(str(E))
+        
+      highest_block_in_pgdb = gcurs.fetchone()[0]
 
-        #time.sleep(1)
+      do_next_block()  ##- tmp make this work, add bstats+data_chain after
+
+      #time.sleep(1)
 
 
     ## done
