@@ -474,7 +474,7 @@ def do_make_data_chain_row( in_bits, in_stats):
 #         highest_block_in_pgdb,
 #         g_chainreward, g_chainfee, g_chainsubsidy )
 
-def do_next_block( in_blockheight ):
+def do_next_block( in_blockheight, in_fee, in_subsidy  ):
     global gcurs, gconn
     #global g_chainreward, g_chainfee, g_chainsubsidy
     global _verbose #, g_height_imported
@@ -534,6 +534,7 @@ def do_next_block( in_blockheight ):
 
     block_stats_row = get_block_stats_row( g_height_imported+1 )
 
+    ## CHANGE HERE - use the data_chain row as the source for values
     ## record the new block row
     #write_block_bits_row( block_bits_row)
     fee = int(block_stats_row[3])       # ln3_totalfee)
@@ -608,7 +609,7 @@ def do_next_block( in_blockheight ):
 
 ##----------------------------------------------------------------
 def do_main_loop():
-    global g_chainreward, g_chainfee, g_chainsubsidy
+    #global g_chainreward, g_chainfee, g_chainsubsidy
     global _verbose   #g_height_imported
 
     while True:
@@ -630,7 +631,7 @@ def do_main_loop():
         print(str(E))
       
       if _verbose: print('do_main_loop: highest_block_in_pgdb = '+str(highest_block_in_pgdb))
-      do_next_block( highest_block_in_pgdb )
+      do_next_block( highest_block_in_pgdb, in_fee, in_subsidy )
 
       #do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
