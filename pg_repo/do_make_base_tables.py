@@ -514,8 +514,8 @@ def do_next_block():
 
     ## record the new block row
     #write_block_bits_row( block_bits_row)
-    fee = int(in_stats[3])       # ln3_totalfee)
-    subsidy = int(in_stats[2])   # ln2_subsidy)
+    fee = int(block_stats_row[3])       # ln3_totalfee)
+    subsidy = int(block_stats_row[2])   # ln2_subsidy)
     g_chainreward = g_chainreward + fee + subsidy
     g_chainfee = g_chainfee + fee
     g_chainsubsidy = g_chainsubsidy + subsidy
