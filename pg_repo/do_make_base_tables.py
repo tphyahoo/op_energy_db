@@ -496,9 +496,9 @@ def do_next_block( in_blockheight ):
 
     ##---------------------------------------------
 
-    if (in_blockheight > 0):
-
-        print( str(in_blockheight))
+    if ( not in_blockheight > 0):
+        print( 'ERR: '+str(in_blockheight))
+        return
 
     ## ask for a new block row
     ##   if none, sleep and return
@@ -602,11 +602,13 @@ def do_main_loop():
         gcurs.execute( qry_SQL )
       except Exception, E:
         print(str(E))
-        
+      
+      res_qry = gcurs.fetchone()
+      # safety check here
       highest_block_in_pgdb = gcurs.fetchone()[0]
       if _verbose: print('highest_block_in_pgdb: '+str(highest_block_in_pgdb))
 
-      do_next_block( highest_block_in_pgdb )
+      do_next_block( highest_block_in_pgdb+1 )
 
       #do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
