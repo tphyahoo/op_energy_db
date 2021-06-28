@@ -474,7 +474,7 @@ def get_block_stats_row( in_height ):
 #         highest_block_in_pgdb,
 #         g_chainreward, g_chainfee, g_chainsubsidy )
 
-def do_next_block( in_blockheight, in_fee, in_subsidy  ):
+def INSERT_block_to_pgdb( in_blockheight, in_fee, in_subsidy  ):
     global gcurs, gconn
     #global g_chainreward, g_chainfee, g_chainsubsidy
     global _verbose #, g_height_imported
@@ -631,13 +631,7 @@ def do_main_loop():
         print(str(E))
       
       if _verbose: print('do_main_loop: highest_block_in_pgdb = '+str(highest_block_in_pgdb))
-      do_next_block( highest_block_in_pgdb, in_fee, in_subsidy )
-      # next_block = {}
-      # next_block = fetch_block( highest_block_in_pgdb + 1)
-      # if not found
-      #   sleep, do nothing
-      # else
-      #   insert_block_pgdb ( highest_block_in_pgdb + 1, next_block[in_fee], next_block[in_subsidy] , whatever else)
+      INSERT_block_to_pgdb( highest_block_in_pgdb, in_fee, in_subsidy )
 
       #do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
