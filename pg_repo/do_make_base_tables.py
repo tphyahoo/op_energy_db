@@ -500,17 +500,35 @@ def do_next_block( in_blockheight ):
         print( 'ERR: '+str(in_blockheight))
         return
 
+    ##=======================================================
+    ## MONDAY hack -----
+
     ## ask for a new block row
     ##   if none, sleep and return
-    block_bits_row = get_block_bits_row( in_blockheight )
+    block_bits_row = get_block_bits_row( in_blockheight+1 )
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
         time.sleep(10)
         return   # nothing to do
 
 
-    ##=======================================================
-    ## MONDAY hack -----
+    ##--- We know that there is a new BLOCK available
+    ##     get the last known row for accumulators
+
+    get_datachain_row_SQL = '''
+      SELECT a, b, c from public.data_chain where blockheight = %s
+    '''
+    ##-=
+    try:
+      gcurs.execute( get_datachain_row_SQL )
+      gconn.commit()
+      res_qry = gcurs.fetchone()
+      #
+      if _verbose: print( 'DEBUG get_datachain_row_SQL = ' + str(res_qry) )
+    except Exception, E:
+      print(str(E))
+
+
     out_chainreward = 0L
     out_chainfee = 0L
     out_chainsubsidy = 0L
@@ -600,20 +618,18 @@ def do_main_loop():
         qry_SQL = "SELECT max(blockheight) from data_chain"
         #qry_SQL = 'with rows as (SELECT blockheight as height from data_chain) SELECT max(rows.height) from rows'
         gcurs.execute( qry_SQL )
+        # safety check here
+        res_qry = gcurs.fetchone()
+        highest_block_in_pgdb = gcurs.fetchone()[0]
       except Exception, E:
         print(str(E))
       
-      res_qry = gcurs.fetchone()
-      # safety check here
-      highest_block_in_pgdb = gcurs.fetchone()[0]
-      if _verbose: print('highest_block_in_pgdb: '+str(highest_block_in_pgdb))
-
-      do_next_block( highest_block_in_pgdb+1 )
+      if _verbose: print('do_main_loop: highest_block_in_pgdb = '+str(highest_block_in_pgdb))
+      do_next_block( highest_block_in_pgdb )
 
       #do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
       #time.sleep(1)
-
 
     ## done
     return
