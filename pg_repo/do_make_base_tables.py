@@ -418,55 +418,55 @@ def get_block_stats_row( in_height ):
 #  return
 
 ##----------------------------------------
-def do_make_data_chain_row( in_bits, in_stats):
-    global _verbose
-    global g_chainreward, g_chainfee, g_chainsubsidy
-
-    sys.exit(1) ## <unused FAIL error
+#def do_make_data_chain_row( in_bits, in_stats):
+#    global _verbose
+#    global g_chainreward, g_chainfee, g_chainsubsidy
+#
+#    sys.exit(1) ## <unused FAIL error
     ## update aggregate totals
-    fee = int(in_stats[3])       # ln3_totalfee)
-    subsidy = int(in_stats[2])   # ln2_subsidy)
-    g_chainreward = g_chainreward + fee + subsidy
-    g_chainfee = g_chainfee + fee
-    g_chainsubsidy = g_chainsubsidy + subsidy
+#    fee = int(in_stats[3])       # ln3_totalfee)
+#    subsidy = int(in_stats[2])   # ln2_subsidy)
+#    g_chainreward = g_chainreward + fee + subsidy
+#    g_chainfee = g_chainfee + fee
+#    g_chainsubsidy = g_chainsubsidy + subsidy
 
-    if _verbose:
-      print( '  aggregate totals:')
-      print( '             fee '+str(type(fee))+' '+str(fee)  )
-      print( '         subsidy '+str(type(subsidy))+' '+str(subsidy)  )
-      print( '   g_chainreward'+str(type(g_chainreward))+' '+hex(g_chainreward)  )
-      print( '      g_chainfee'+str(type(g_chainfee))+' '+hex(g_chainfee)  )
-      print( '  g_chainsubsidy'+str(type(g_chainsubsidy))+' '+hex(g_chainsubsidy)  )
+#    if _verbose:
+#      print( '  aggregate totals:')
+#      print( '             fee '+str(type(fee))+' '+str(fee)  )
+#      print( '         subsidy '+str(type(subsidy))+' '+str(subsidy)  )
+#      print( '   g_chainreward'+str(type(g_chainreward))+' '+hex(g_chainreward)  )
+#      print( '      g_chainfee'+str(type(g_chainfee))+' '+hex(g_chainfee)  )
+#      print( '  g_chainsubsidy'+str(type(g_chainsubsidy))+' '+hex(g_chainsubsidy)  )
 
     ## - SQL data_chain  uses tables already in place
-    insert_dc_SQL = '''
-    INSERT into  public.data_chain
-    SELECT b.height_str::integer ,
-            b.hash_str ,
-            cbits_str ,
-            b.difficulty_str::float ,
-            chainwork_str ,
-            %s ,   -- derive this, remove in_btc_raw
-            %s ,
-            %s ,
-            in_stats_raw.median_time_str::integer ,
-            in_stats_raw.block_time_str::integer
-      FROM public.in_bits_raw as b
-      LEFT JOIN
-        in_stats_raw on (b.height_str = in_stats_raw.height_str)
-      WHERE b.height_str LIKE %s
-    '''
-    try:
-      tkey = in_bits[0]
-      gcurs.execute( insert_dc_SQL, ( g_chainreward, g_chainsubsidy, g_chainfee, tkey ) )
-      gconn.commit()
-    except Exception, E:
-      print(str(E))
+#    insert_dc_SQL = '''
+#    INSERT into  public.data_chain
+#    SELECT b.height_str::integer ,
+#            b.hash_str ,
+#            cbits_str ,
+#            b.difficulty_str::float ,
+#            chainwork_str ,
+#            %s ,   -- derive this, remove in_btc_raw
+#            %s ,
+#            %s ,
+#            in_stats_raw.median_time_str::integer ,
+#            in_stats_raw.block_time_str::integer
+#      FROM public.in_bits_raw as b
+#      LEFT JOIN
+#        in_stats_raw on (b.height_str = in_stats_raw.height_str)
+#      WHERE b.height_str LIKE %s
+#    '''
+#    try:
+#      tkey = in_bits[0]
+#      gcurs.execute( insert_dc_SQL, ( g_chainreward, g_chainsubsidy, g_chainfee, tkey ) )
+#      gconn.commit()
+#    except Exception, E:
+#      print(str(E))
 
     ##-------------------
-    if _verbose: print("  do_make_data_chain_row")
-    if _verbose: print(  '   '+str(( g_chainreward, g_chainsubsidy, g_chainfee, tkey )) )
-    return
+#    if _verbose: print("  do_make_data_chain_row")
+#    if _verbose: print(  '   '+str(( g_chainreward, g_chainsubsidy, g_chainfee, tkey )) )
+#    return
 
 
 ##----------------------------------------
