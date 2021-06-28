@@ -252,7 +252,7 @@ def do_import_bbits():
 #   rely on table definition in the template; may change
 def do_import_bstats():
   global g_chainreward, g_chainfee, g_chainsubsidy
-  global _test_mode, g_stats_rows
+  global _test_mode, g_stats_rows, _verbose
   global gcurs, gconn
 
   init_stats_SQL = '''
@@ -313,6 +313,7 @@ def do_import_bstats():
 #  get_block_bits_row
 #
 def get_block_bits_row( in_height ):
+  global _verbose
   ## request a row as 1-based $HEIGHT
   local_height = len(g_bits_rows)
 
@@ -349,7 +350,7 @@ def get_block_stats_row( in_height ):
 
 #----------------------------------------------------------------
 def write_block_bits_row( in_row ):
-
+  global _verbose
   try:
     t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
     gcurs.execute( t_SQL,
@@ -380,7 +381,7 @@ def write_block_stats_row( in_row ):
 
 def do_init_data_chain():
     global g_chainreward, g_chainfee, g_chainsubsidy
-    global _test_mode, g_bits_rows
+    global _test_mode, g_bits_rows, _verbose
     global gcurs, gconn
 
     ## odd-but-true, sums here have been pre-initialized; may change
