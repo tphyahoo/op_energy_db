@@ -347,7 +347,7 @@ def get_block_stats_row( in_height ):
   return res_data
 
 
-
+monday-hack-comments = '''
 #----------------------------------------------------------------
 def write_block_bits_row( in_row ):
   global _verbose
@@ -376,45 +376,7 @@ def write_block_stats_row( in_row ):
   if _verbose: print('  write_block_stats_row')
   return
 
-
-##----------------------------------------
-
-def do_init_data_chain():
-    global g_chainreward, g_chainfee, g_chainsubsidy
-    global _test_mode, g_bits_rows, _verbose
-    global gcurs, gconn
-
-    ## odd-but-true, sums here have been pre-initialized; may change
-    #g_chainreward   = 0L
-    #g_chainfee      = 0L
-    #g_chainsubsidy  = 0L
-
-    ##-----------------------------------------------------------------
-    init_dc_SQL = '''
-    DROP table if exists data_chain cascade;
-    CREATE TABLE public.data_chain (
-      blockheight integer PRIMARY KEY,
-      blockhash text         ,
-      compact_bits_hex text  ,
-      difficulty float       ,
-      chainwork_hex text     ,
-      chain_reward   bigint  ,
-      chain_subsidy  bigint  ,
-      chain_totalfee bigint  ,
-      median_time    integer ,
-      block_time     integer
-    );
-    '''
-    try:
-      comment_SQL = "COMMENT ON TABLE public.data_chain IS '-v0-0';"
-      gcurs.execute( init_dc_SQL )
-      gcurs.execute( comment_SQL )
-      gconn.commit()
-    except Exception, E:
-      print(str(E))
-
-    ## -----------------
-    return
+'''
 
 
 ##----------------------------------------
@@ -422,6 +384,7 @@ def do_make_data_chain_row( in_bits, in_stats):
     global _verbose
     global g_chainreward, g_chainfee, g_chainsubsidy
 
+    sys.exit(1) ## <unused FAIL error
     ## update aggregate totals
     fee = int(in_stats[3])       # ln3_totalfee)
     subsidy = int(in_stats[2])   # ln2_subsidy)
@@ -466,6 +429,48 @@ def do_make_data_chain_row( in_bits, in_stats):
     if _verbose: print("  do_make_data_chain_row")
     if _verbose: print(  '   '+str(( g_chainreward, g_chainsubsidy, g_chainfee, tkey )) )
     return
+
+
+
+##----------------------------------------
+
+def do_init_data_chain():
+    global g_chainreward, g_chainfee, g_chainsubsidy
+    global _test_mode, g_bits_rows, _verbose
+    global gcurs, gconn
+
+    ## odd-but-true, sums here have been pre-initialized; may change
+    #g_chainreward   = 0L
+    #g_chainfee      = 0L
+    #g_chainsubsidy  = 0L
+
+    ##-----------------------------------------------------------------
+    init_dc_SQL = '''
+    DROP table if exists data_chain cascade;
+    CREATE TABLE public.data_chain (
+      blockheight integer PRIMARY KEY,
+      blockhash text         ,
+      compact_bits_hex text  ,
+      difficulty float       ,
+      chainwork_hex text     ,
+      chain_reward   bigint  ,
+      chain_subsidy  bigint  ,
+      chain_totalfee bigint  ,
+      median_time    integer ,
+      block_time     integer
+    );
+    '''
+    try:
+      comment_SQL = "COMMENT ON TABLE public.data_chain IS '-v0-0';"
+      gcurs.execute( init_dc_SQL )
+      gcurs.execute( comment_SQL )
+      gconn.commit()
+    except Exception, E:
+      print(str(E))
+
+    ## -----------------
+    return
+
 
 
 ##----------------------------------------
