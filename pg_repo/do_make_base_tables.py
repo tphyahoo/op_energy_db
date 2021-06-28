@@ -586,8 +586,7 @@ def do_next_block():
 ##----------------------------------------------------------------
 def do_main_loop():
 
-    looping_flag = True
-    while (looping_flag):
+    while True:
 
         do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
