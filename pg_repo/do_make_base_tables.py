@@ -564,7 +564,7 @@ def do_next_block():
           in_stats_raw on (b.height_str = in_stats_raw.height_str)
         WHERE b.height_str LIKE %s
       '''
-      tkey = in_bits[0]
+      tkey = block_bits_row[0]
       gcurs.execute( insert_dc_SQL, ( g_chainreward, g_chainsubsidy, g_chainfee, tkey ) )
 
       gconn.commit()
