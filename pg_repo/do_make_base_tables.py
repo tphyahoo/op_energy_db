@@ -470,10 +470,14 @@ def do_make_data_chain_row( in_bits, in_stats):
 
 
 ##----------------------------------------
-def do_next_block():
+#res_height, g_chainreward, g_chainfee, g_chainsubsidy = do_next_block( 
+#         highest_block_in_pgdb,
+#         g_chainreward, g_chainfee, g_chainsubsidy )
+
+def do_next_block( in_blockheight, in_chainreward, in_chainfee, g_chainsubsidy ):
     global gcurs, gconn
-    global g_chainreward, g_chainfee, g_chainsubsidy
-    global _verbose, g_height_imported
+    #global g_chainreward, g_chainfee, g_chainsubsidy
+    global _verbose #, g_height_imported
 
     ##  TEST current $HEIGHT up to date?
     ##
@@ -492,13 +496,13 @@ def do_next_block():
 
     ##---------------------------------------------
 
-    if (g_height_imported > 0):
+    if (in_blockheight > 0):
 
-        print( str(g_height_imported))
+        print( str(in_blockheight))
 
     ## ask for a new block row
     ##   if none, sleep and return
-    block_bits_row = get_block_bits_row( g_height_imported+1 )
+    block_bits_row = get_block_bits_row( in_blockheight )
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
         time.sleep(10)
@@ -507,22 +511,28 @@ def do_next_block():
 
     ##=======================================================
     ## MONDAY hack -----
+    out_chainreward = 0L
+    out_chainfee = 0L
+    out_chainsubsidy = 0L
+
     block_stats_row = get_block_stats_row( g_height_imported+1 )
 
     ## record the new block row
     #write_block_bits_row( block_bits_row)
     fee = int(block_stats_row[3])       # ln3_totalfee)
     subsidy = int(block_stats_row[2])   # ln2_subsidy)
-    g_chainreward = g_chainreward + fee + subsidy
-    g_chainfee = g_chainfee + fee
-    g_chainsubsidy = g_chainsubsidy + subsidy
+
+    out_chainreward = in_chainreward + fee + subsidy
+    out_chainfee = in_chainfee + fee
+    out_chainsubsidy = g_chainsubsidy + subsidy
+
     if _verbose:
       print( '  aggregate totals:')
       print( '             fee '+str(type(fee))+' '+str(fee)  )
       print( '         subsidy '+str(type(subsidy))+' '+str(subsidy)  )
-      print( '   g_chainreward'+str(type(g_chainreward))+' '+hex(g_chainreward)  )
-      print( '      g_chainfee'+str(type(g_chainfee))+' '+hex(g_chainfee)  )
-      print( '  g_chainsubsidy'+str(type(g_chainsubsidy))+' '+hex(g_chainsubsidy)  )
+      print( '   out_chainreward'+str(type(out_chainreward))+' '+hex(out_chainreward)  )
+      print( '      out_chainfee'+str(type(out_chainfee))+' '+hex(out_chainfee)  )
+      print( '  out_chainsubsidy'+str(type(out_chainsubsidy))+' '+hex(out_chainsubsidy)  )
 
     try:
       t_bits_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
@@ -560,26 +570,29 @@ def do_next_block():
           in_stats_raw on (b.height_str = in_stats_raw.height_str)
         WHERE b.height_str LIKE %s
       '''
-      tkey = block_bits_row[0]
-      gcurs.execute( insert_dc_SQL, ( g_chainreward, g_chainsubsidy, g_chainfee, tkey ) )
+      tkey = block_bits_row[0]  ##<- CHECK THIS 
+      gcurs.execute( insert_dc_SQL, ( out_chainreward, out_chainsubsidy, out_chainfee, tkey ) )
 
       gconn.commit()
     except Exception, E:
         print(str(E))
 
-      ## update global row list and counter
-    g_height_imported = g_height_imported + 1
+    ## update global row list and counter
+    #g_height_imported = g_height_imported + 1
 
     ##------------------ end MONDAY hack
 
 
     ##------------------------
     if _verbose: print('DEBUG  loop - returns')
-    return
+    return  g_height_imported, out_chainreward, out_chainfee, out_chainsubsidy
+
 
 
 ##----------------------------------------------------------------
 def do_main_loop():
+    global g_chainreward, g_chainfee, g_chainsubsidy
+    global _verbose   #g_height_imported
 
     while True:
 
@@ -593,7 +606,10 @@ def do_main_loop():
       highest_block_in_pgdb = gcurs.fetchone()[0]
       if _verbose: print('highest_block_in_pgdb: '+str(highest_block_in_pgdb))
 
-      do_next_block( a, b, c, d, e )
+      res_height, g_chainreward, g_chainfee, g_chainsubsidy = do_next_block( 
+         highest_block_in_pgdb,
+         g_chainreward, g_chainfee, g_chainsubsidy )
+
       #do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
       #time.sleep(1)
