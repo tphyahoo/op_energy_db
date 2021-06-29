@@ -187,7 +187,6 @@ def setup():
     return
     # done setup()
 
-
 #-------------------------------------------------------------
 #
 def do_import_bbits():
@@ -217,12 +216,24 @@ def do_import_bbits():
     except Exception, E:
       print(str(E))
     ## -----------------------------------------------
+    bitstxt_fd = None
     try:
       infile_name = 'blockbits.txt'
       bitstxt_fd = open( _dst_ddir+infile_name, 'r' )
     except Exception, E:
       print( str(E) )
-      exit(1)
+  
+    if bitstxt_fd is None:
+      # No startup data file?
+      #  init with preformed first row
+      ln0_height      = 1
+      ln1_blockhash   = 0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048
+      ln2_cbits     = '0x1d00ffff'
+      ln3_difficulty    = 1.0
+      ln4_chainwork = '0x200020002'
+      local_row = (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork )
+      g_bits_rows.append(local_row)
+      return
 
     while True:
       ln0_height = bitstxt_fd.readline()
@@ -279,10 +290,23 @@ def do_import_bstats():
   ## see  bitcoin-cli getblockstats $HEIGHT
   ## height, blockhash, subsidy, totalfee, time, mediantime
   try:
+    bitstats_fd = None
     bitstats_fd = open( _dst_ddir+'blockstats.txt', 'r' )
   except Exception, E:
     print( str(E) )
-    exit(1)
+  
+  if bitstats_fd is None:
+    # No startup data file?
+    #  init with preformed first row
+    ln0_height      = 1
+    ln1_blockhash   = 0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048
+    ln2_subsidy     = 5000000000
+    ln3_totalfee    = 0
+    ln4_median_time = 1231469665
+    ln5_block_time  = 1231469665
+    local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)
+    g_stats_rows.append(local_row)
+    return
 
   while True:
     ln0_height = bitstats_fd.readline()
@@ -307,8 +331,6 @@ def do_import_bstats():
   bitstats_fd.close()
 
   return
-
-
 
 
 ##----------------------------------------
@@ -527,12 +549,11 @@ def INSERT_block_to_pgdb( in_blockheight, in_fee, in_subsidy  ):
     except Exception, E:
       print(str(E))
 
-
     out_chainreward = 0L
     out_chainfee = 0L
     out_chainsubsidy = 0L
 
-    block_stats_row = get_block_stats_row( g_height_imported+1 )
+    block_stats_row = get_block_stats_row( in_blockheight+1 )
 
     ## CHANGE HERE - use the data_chain row as the source for values
     ## record the new block row
