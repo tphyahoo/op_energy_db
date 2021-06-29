@@ -496,7 +496,7 @@ def get_block_stats_row( in_height ):
 #         highest_block_in_pgdb,
 #         g_chainreward, g_chainfee, g_chainsubsidy )
 
-def INSERT_block_to_pgdb( in_blockheight, in_fee, in_subsidy  ):
+def INSERT_block_to_pgdb( in_blockheight ):
     global gcurs, gconn
     #global g_chainreward, g_chainfee, g_chainsubsidy
     global _verbose #, g_height_imported
@@ -624,9 +624,7 @@ def INSERT_block_to_pgdb( in_blockheight, in_fee, in_subsidy  ):
 
     ##------------------------
     if _verbose: print('DEBUG  loop - returns')
-    return 
-
-
+    return
 
 ##----------------------------------------------------------------
 def do_main_loop():
@@ -636,7 +634,7 @@ def do_main_loop():
     while True:
 
       ## init - if there are no data_chain rows yet, MAX() reutrns NULL
-      ##  check for NULL , pass a blockheight = 1  
+      ##  check for NULL , pass a blockheight = 1
 
       ## qry the data_chain table, if there are no entries, ask for HEIGHT 1
 
@@ -647,10 +645,13 @@ def do_main_loop():
         gcurs.execute( qry_SQL )
         # safety check here
         res_qry = gcurs.fetchone()
-        highest_block_in_pgdb = gcurs.fetchone()[0]
+        if res_qry[0] is None:
+          highest_block_in_pgdb = 1
+        else:
+          highest_block_in_pgdb = int(res_qry[0])
       except Exception, E:
         print(str(E))
-      
+
       if _verbose: print('do_main_loop: highest_block_in_pgdb = '+str(highest_block_in_pgdb))
       # next_block = {}
       # next_block = fetch_block( highest_block_in_pgdb + 1)
@@ -658,7 +659,7 @@ def do_main_loop():
       #   sleep, do nothing
       # else
       #   insert_block_pgdb ( highest_block_in_pgdb + 1, next_block[in_fee], next_block[in_subsidy] , whatever else)
-      INSERT_block_to_pgdb( highest_block_in_pgdb, in_fee, in_subsidy )
+      INSERT_block_to_pgdb( highest_block_in_pgdb )
 
       #do_next_block()  ##- tmp make this work, add bstats+data_chain after
 
