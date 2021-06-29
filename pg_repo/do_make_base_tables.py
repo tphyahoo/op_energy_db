@@ -537,15 +537,19 @@ def INSERT_block_to_pgdb( in_blockheight ):
     ##     get the last known row for accumulators
 
     get_datachain_row_SQL = '''
-      SELECT a, b, c from public.data_chain where blockheight = %s
+      SELECT   chain_reward, chain_subsidy, chain_totalfee 
+        FROM   public.data_chain 
+       WHERE   blockheight = %s
     '''
+  
     ##-=
     try:
-      gcurs.execute( get_datachain_row_SQL )
+      gcurs.execute( get_datachain_row_SQL, (in_blockheight,) )
       gconn.commit()
       res_qry = gcurs.fetchone()
       #
       if _verbose: print( 'DEBUG get_datachain_row_SQL = ' + str(res_qry) )
+      if _verbose: print( str(res_qry)+'-')
     except Exception, E:
       print(str(E))
 
@@ -558,8 +562,8 @@ def INSERT_block_to_pgdb( in_blockheight ):
     ## CHANGE HERE - use the data_chain row as the source for values
     ## record the new block row
     #write_block_bits_row( block_bits_row)
-    fee = int(block_stats_row[3])       # ln3_totalfee)
-    subsidy = int(block_stats_row[2])   # ln2_subsidy)
+    fee     = int( res_qry[2])   # ln3_totalfee)
+    subsidy = int( res_qry[1])   # ln2_subsidy)
 
     out_chainreward = in_chainreward + fee + subsidy
     out_chainfee = in_chainfee + fee
