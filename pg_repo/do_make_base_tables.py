@@ -196,7 +196,7 @@ def do_import_bbits():
 
     ##-----------------------------------------------------------------
     ##  import first info file -- blockbits -
-    ##   ref.  bitcoin-cli getblockstats $HEIGHT
+    ##   ref.  bitcoin-cli getblock $HASH
     ##   ( height, blockhash, bits, difficulty, chainwork )
     init_ibr_SQL = '''
     DROP table if exists in_bits_raw cascade;
