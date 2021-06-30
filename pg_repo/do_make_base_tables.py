@@ -34,22 +34,22 @@ gcurs = None
 ##- setup for PG connection
 #  check ENV for connection details; ERROR if not found
 try:
-  _pgrepo     = os.getenv('PG_REPO')+'/'
-  _src_ddir   = os.getenv('SRC_DDIR')+'/'
-  _dst_ddir   = os.getenv('DST_DDIR')+'/'
+    _pgrepo     = os.getenv('PG_REPO')+'/'
+    _src_ddir   = os.getenv('SRC_DDIR')+'/'
+    _dst_ddir   = os.getenv('DST_DDIR')+'/'
 
-  _pgdb       = os.getenv('PGDATABASE')
-  _pghost     = os.getenv('PGHOST')
-  _pgport     = os.getenv('PGPORT')
-  _pguser     = os.getenv('PGUSER')
-  _pgpassword = os.getenv('PGPASSWORD')
+    _pgdb       = os.getenv('PGDATABASE')
+    _pghost     = os.getenv('PGHOST')
+    _pgport     = os.getenv('PGPORT')
+    _pguser     = os.getenv('PGUSER')
+    _pgpassword = os.getenv('PGPASSWORD')
 
-  _test_mode  = os.getenv('SDEBUG')
-  _verbose    = os.getenv('VERBOSE')
+    _test_mode  = os.getenv('SDEBUG')
+    _verbose    = os.getenv('VERBOSE')
 except:
-  print( sys.argv[0] )
-  print( ' ENV not complete' )
-  exit(1)
+    print( sys.argv[0] )
+    print( ' ENV not complete' )
+    exit(1)
 
 ## tables to import  UNDER CONSTRUCTION
 ##   datafile name, dest table name, col count
@@ -218,9 +218,7 @@ def do_import_bbits():
     );
     '''
     try:
-      comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
       gcurs.execute( init_ibr_SQL )
-      gcurs.execute( comment_SQL )
       gconn.commit()
     except Exception, E:
       print(str(E))
@@ -231,7 +229,7 @@ def do_import_bbits():
       bitstxt_fd = open( _dst_ddir+infile_name, 'r' )
     except Exception, E:
       print( str(E) )
-  
+
     if bitstxt_fd is None:
       # No startup data file?
       #  init with preformed first row
@@ -241,8 +239,17 @@ def do_import_bbits():
       ln3_difficulty    = 1.0
       ln4_chainwork     = '0x200020002'
       local_row = (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork )
+      if _verbose: print('DEBUG bitstxt_fd is None')
       g_bits_rows.append(local_row)
       return
+
+    ##-= got a seed datafile, add a table comment and load data into RAM
+    try:
+      comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
+      gcurs.execute( comment_SQL )
+      gconn.commit()
+    except Exception, E:
+      print(str(E))
 
     while True:
       ln0_height = bitstxt_fd.readline()
@@ -313,6 +320,7 @@ def do_import_bstats():
     ln4_median_time = 1231469665
     ln5_block_time  = 1231469665
     local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)
+    if _verbose: print('DEBUG bitstats_fd is None')
     g_stats_rows.append(local_row)
     return
 
@@ -353,8 +361,8 @@ def do_import_bstats():
 
 def do_init_data_chain():
     #global g_chainreward, g_chainfee, g_chainsubsidy
-    global _verbose  #, _test_mode, g_bits_rows
-    global gcurs, gconn
+    global _verbose, g_bits_rows
+    global  gcurs,   gconn
 
     ##-----------------------------------------------------------------
     init_dc_SQL = '''
@@ -380,23 +388,26 @@ def do_init_data_chain():
     except Exception, E:
       print(str(E))
 
-    ## -------------------------------------------------------------
-    ##  to simplify the main loop, there is always one row to start
-    init_datachain_SQL = '''
-    INSERT into public.data_chain(
-       blockheight, blockhash,
-       compact_bits_hex, difficulty, chainwork_hex,
-       chain_reward, chain_subsidy, chain_totalfee, median_time, block_time)
-    VALUES (  1, '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
-        '0x1d00ffff', 1.0, '0x200020002',
-         5000000000, 5000000000, 0, 1231469665, 1231469665 );
-    '''
-    try:
-      gcurs.execute( init_datachain_SQL )
-      gconn.commit()
-    except Exception, E:
-      print(str(E))
 
+    if ( len(g_bits_rows) == 1 ):
+      ## -------------------------------------------------------------
+      ##  to simplify the main loop, there is always one row to start
+      init_datachain_SQL = '''
+        INSERT into public.data_chain(
+         blockheight, blockhash,
+         compact_bits_hex, difficulty, chainwork_hex,
+         chain_reward, chain_subsidy, chain_totalfee, median_time, block_time)
+        VALUES (  1, '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
+         '0x1d00ffff', 1.0, '0x200020002',
+          5000000000, 5000000000, 0, 1231469665, 1231469665 );
+      '''
+      try:
+        gcurs.execute( init_datachain_SQL )
+        gconn.commit()
+      except Exception, E:
+        print(str(E))
+
+    ##-- done init data_chain
     return
 
 
@@ -523,21 +534,20 @@ def INSERT_block_to_pgdb( in_blockheight ):
       print( '      local_chainfee'+str(type(local_chainfee))+' '+hex(local_chainfee)  )
       print( '  local_chainsubsidy'+str(type(local_chainsubsidy))+' '+hex(local_chainsubsidy)  )
 
-    ## write logging tables
     try:
+      ## write logging table bits
       t_bits_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
       gcurs.execute( t_bits_SQL,
         (block_bits_row[0],block_bits_row[1],block_bits_row[2],block_bits_row[3],block_bits_row[4]))
       #if _verbose: print('  write_block_bits_row')
 
-      ## get and record a stats row
+      ## write logging table stats
       t_stats_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
       gcurs.execute( t_stats_SQL,
         (block_stats_row[0],block_stats_row[1],block_stats_row[2],block_stats_row[3],block_stats_row[4],block_stats_row[5]))
 
       ## calc and write data_chain row
-
-      ## - SQL data_chain  uses tables already in place
+      ##    - SQL data_chain  uses tables already in place
       insert_dc_SQL = '''
       INSERT into  public.data_chain
       SELECT b.height_str::integer ,
@@ -562,8 +572,6 @@ def INSERT_block_to_pgdb( in_blockheight ):
     except Exception, E:
         print(str(E))
 
-    ## update global row list and counter
-    #g_height_imported = g_height_imported + 1
 
     ##------------------ end MONDAY hack
 
@@ -597,7 +605,7 @@ def do_main_loop():
         print(str(E))
         sys.exit(-1)
 
-      if _verbose: 
+      if _verbose:
         print('do_main_loop- highest_block_in_pgdb: '+str(highest_block_in_pgdb))
 
       INSERT_block_to_pgdb( highest_block_in_pgdb )
