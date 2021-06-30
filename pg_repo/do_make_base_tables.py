@@ -360,7 +360,6 @@ def do_import_bstats():
 ##----------------------------------------
 
 def do_init_data_chain():
-    #global g_chainreward, g_chainfee, g_chainsubsidy
     global _verbose, g_bits_rows
     global  gcurs,   gconn
 
@@ -389,7 +388,7 @@ def do_init_data_chain():
       print(str(E))
 
 
-    if ( len(g_bits_rows) == 1 ):
+    if ( True ):  #len(g_bits_rows) == 1 ):
       ## -------------------------------------------------------------
       ##  to simplify the main loop, there is always one row to start
       init_datachain_SQL = '''
@@ -403,6 +402,39 @@ def do_init_data_chain():
       '''
       try:
         gcurs.execute( init_datachain_SQL )
+        gconn.commit()
+      except Exception, E:
+        print(str(E))
+
+      ## -- always include row 1   bits
+      ln0_height        = 1
+      ln1_blockhash     = '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048'
+      ln2_cbits         = '0x1d00ffff'
+      ln3_difficulty    = 1.0
+      ln4_chainwork     = '0x200020002'
+      
+      try:
+        t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
+        gcurs.execute( t_SQL,
+          (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork))
+        gconn.commit()
+      except Exception, E:
+        print(str(E))
+
+      if _verbose: print('  write_block_bits_row')
+
+      ## -- always include row 1   stats
+      ln0_height      = 1
+      ln1_blockhash   = '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048'
+      ln2_subsidy     = 5000000000L
+      ln3_totalfee    = 0L
+      ln4_median_time = 1231469665
+      ln5_block_time  = 1231469665
+
+      try:
+        t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s,%s)"
+        gcurs.execute( t_SQL,
+          (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_median_time,ln5_block_time))
         gconn.commit()
       except Exception, E:
         print(str(E))
@@ -502,7 +534,6 @@ def INSERT_block_to_pgdb( in_blockheight ):
         FROM   public.data_chain
        WHERE   blockheight = %s
     '''
-
     try:
       gcurs.execute( get_datachain_row_SQL, (in_blockheight,) )
       res_qry = gcurs.fetchone()
@@ -513,14 +544,15 @@ def INSERT_block_to_pgdb( in_blockheight ):
 
     ## use the data_chain row as the source for accumulated values
     ##  only the first row will not have a data_chain entry yet
-    if res_qry is None:
-      local_chainreward  = 5000000000L
-      local_chainfee     = 0L
-      local_chainsubsidy = 5000000000L
-    else:
-      local_chainreward  = long(res_qry[0])
-      local_chainfee     = long(res_qry[1])
-      local_chainsubsidy = long(res_qry[2])
+    #if res_qry is None:
+    #  local_chainreward  = 5000000000L
+    #  local_chainfee     = 0L
+    #  local_chainsubsidy = 5000000000L
+    #else:
+      
+    local_chainreward  = long(res_qry[0])
+    local_chainfee     = long(res_qry[1])
+    local_chainsubsidy = long(res_qry[2])
 
     ## get fee info from in-memory list
     ## height, blockhash, subsidy, totalfee, time, mediantime
@@ -540,19 +572,19 @@ def INSERT_block_to_pgdb( in_blockheight ):
       print( '  local_chainsubsidy'+str(type(local_chainsubsidy))+' '+hex(local_chainsubsidy)  )
 
     try:
-      ## write logging table bits
+      ## -- write logging table   bits
       t_bits_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
       gcurs.execute( t_bits_SQL,
         (block_bits_row[0],block_bits_row[1],block_bits_row[2],block_bits_row[3],block_bits_row[4]))
       #if _verbose: print('  write_block_bits_row')
 
-      ## write logging table stats
+      ## -- write logging table   stats
       t_stats_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
       gcurs.execute( t_stats_SQL,
         (block_stats_row[0],block_stats_row[1],block_stats_row[2],block_stats_row[3],block_stats_row[4],block_stats_row[5]))
 
-      ## calc and write data_chain row
-      ##    - SQL data_chain  uses tables already in place
+      ## -- calc and write       data_chain
+      ##    - SQL data_chain  uses tables already in place  TODO rewrite 
       insert_dc_SQL = '''
       INSERT into  public.data_chain
       SELECT b.height_str::integer ,
@@ -575,11 +607,9 @@ def INSERT_block_to_pgdb( in_blockheight ):
 
       gconn.commit()
     except Exception, E:
-        print(str(E))
-
+      print(str(E))
 
     ##------------------ end MONDAY hack
-
 
     ##------------------------
     if _verbose: print('DEBUG  loop - returns')
