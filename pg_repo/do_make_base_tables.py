@@ -412,7 +412,7 @@ def do_init_data_chain():
       ln2_cbits         = '0x1d00ffff'
       ln3_difficulty    = 1.0
       ln4_chainwork     = '0x200020002'
-      
+
       try:
         t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
         gcurs.execute( t_SQL,
@@ -483,11 +483,14 @@ def get_block_stats_row( in_row ):
 
 
 ##----------------------------------------
-
 def INSERT_block_to_pgdb( in_row_cnt, in_blockheight ):
     global gcurs, gconn
     global g_bits_rows, g_stats_rows
     global _verbose #, g_height_imported
+
+    if ( not in_blockheight > 0):
+        print( 'ERR: block height '+str(in_blockheight))
+        return
 
     ##  TEST current $HEIGHT up to date?
     ##
@@ -504,9 +507,6 @@ def INSERT_block_to_pgdb( in_row_cnt, in_blockheight ):
     ##
     ##---------------------------------------------
     ##  $HEIGHT is one or greater, ERROR otherwise
-    if ( not in_blockheight > 0):
-        print( 'ERR: block height '+str(in_blockheight))
-        return
 
     ##=======================================================
     ## MONDAY hack -----
@@ -549,7 +549,7 @@ def INSERT_block_to_pgdb( in_row_cnt, in_blockheight ):
     #  local_chainfee     = 0L
     #  local_chainsubsidy = 5000000000L
     #else:
-      
+
     local_chainreward  = long(res_qry[0])
     local_chainfee     = long(res_qry[1])
     local_chainsubsidy = long(res_qry[2])
