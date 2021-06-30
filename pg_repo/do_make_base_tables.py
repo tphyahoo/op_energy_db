@@ -506,8 +506,8 @@ def INSERT_block_to_pgdb( in_blockheight ):
     subsidy = long( block_stats_row[2])   # ln2_subsidy)
 
     local_chainreward  = local_chainreward + fee + subsidy
-    local_chainfee     = in_chainfee + fee
-    local_chainsubsidy = g_chainsubsidy + subsidy
+    local_chainfee     = local_chainfee + fee
+    local_chainsubsidy = local_chainsubsidy + subsidy
 
     if _verbose:
       print( '   aggregate totals:')
