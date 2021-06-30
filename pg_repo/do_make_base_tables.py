@@ -513,7 +513,7 @@ def INSERT_block_to_pgdb( in_blockheight ):
 
     ## use the data_chain row as the source for accumulated values
     ##  only the first row will not have a data_chain entry yet
-    if res_qry[0] is None:
+    if res_qry is None:
       local_chainreward  = 5000000000L
       local_chainfee     = 0L
       local_chainsubsidy = 5000000000L
