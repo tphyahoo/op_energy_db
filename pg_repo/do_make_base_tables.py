@@ -447,44 +447,44 @@ def do_init_data_chain():
 #  get_block_bits_row
 #    request a row as 1-based $HEIGHT
 #
-def get_block_bits_row( in_height ):
+def get_block_bits_row( in_row ):
   global  g_bits_rows, _verbose
 
-  local_height = len(g_bits_rows)
+  local_rows = len(g_bits_rows)
 
-  if (in_height <= local_height):
-    res_data = g_bits_rows[in_height-1]  # 0-based index here
+  if (in_row <= local_rows):
+    res_data = g_bits_rows[in_row-1]  # 0-based index here
   else:
     res_data = None
 
-  if _verbose: print(' in_height :'+str(in_height)+'; local_height:'+str(local_height))
+  if _verbose: print(' in_row :'+str(in_row)+'; local_rows:'+str(local_rows))
   if _verbose: print(' '+str(res_data))
   return res_data
 
 
 #-------------------------------------------------------------
 #  get_block_stats_row
-#   request a row as 1-based $HEIGHT
+#   request a row           ##as 1-based $HEIGHT##
 #
-def get_block_stats_row( in_height ):
+def get_block_stats_row( in_row ):
   global g_stats_rows, _verbose
 
-  local_height = len(g_stats_rows)
+  local_rows = len(g_stats_rows)
 
-  if (in_height <= local_height):
-    res_data = g_stats_rows[in_height-1]  # 0-based index here
+  if (in_row <= local_rows):
+    res_data = g_stats_rows[ in_row-1]  # 0-based index here
   else:
     res_data = None
 
   if _verbose: print(' get_block_stats_row:')
-  if _verbose: print('  in_height :'+str(in_height)+'; local_height:'+str(local_height))
+  if _verbose: print('  in_row :'+str(in_row)+'; local_rows:'+str(local_rows))
   if _verbose: print(' '+str(res_data))
   return res_data
 
 
 ##----------------------------------------
 
-def INSERT_block_to_pgdb( in_blockheight ):
+def INSERT_block_to_pgdb( in_row_cnt, in_blockheight ):
     global gcurs, gconn
     global g_bits_rows, g_stats_rows
     global _verbose #, g_height_imported
@@ -513,13 +513,13 @@ def INSERT_block_to_pgdb( in_blockheight ):
 
     ## ask for a new BLOCK row
     ##   if none, sleep and return
-    block_bits_row = get_block_bits_row( in_blockheight+1 )
+    block_bits_row = get_block_bits_row( in_row_cnt+1 )
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
         time.sleep(10)
         return   #  no new block; nothing to do
 
-    block_stats_row = get_block_stats_row( in_blockheight+1 )
+    block_stats_row = get_block_stats_row( in_row_cnt+1 )
 
     ##--- A new BLOCK is available  ------------------------------
 
@@ -624,12 +624,20 @@ def do_main_loop():
       ##  query the data_chain table
       ##   get highest block already known and recorded
       ##
-      ##  note: if there are no data_chain rows yet, MAX() returns NULL
-      ##   if max() is NULL , pass a blockheight = 1
-      ##   all other cases, pass the MAX known data_chain height
+
+      try:
+        qry_SQL = "SELECT count(*) from data_chain"
+        gcurs.execute( qry_SQL )
+        row_count = gcurs.fetchone()[0]
+        
+      except Exception, E:
+        print(str(E))
+        sys.exit(-1)
+      ##---------------------------------------------------
       try:
         qry_SQL = "SELECT max(blockheight) from data_chain"
         gcurs.execute( qry_SQL )
+
         # safety check
         res_qry = gcurs.fetchone()
         if res_qry[0] is not None:
@@ -642,8 +650,9 @@ def do_main_loop():
 
       if _verbose:
         print('do_main_loop- highest_block_in_pgdb: '+str(highest_block_in_pgdb))
+        print('              data_chain rows: '+str(row_count))
 
-      INSERT_block_to_pgdb( highest_block_in_pgdb )
+      INSERT_block_to_pgdb( row_cnt, highest_block_in_pgdb )
 
     ## done
     return
