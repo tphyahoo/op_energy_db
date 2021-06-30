@@ -9,22 +9,29 @@ import sys,os
 import time
 import psycopg2
 
-## define one PG connection, one cursor
+##----------------------------------------------------------
+##  global variables
+
+# in-memory logging tables
+g_bits_rows  = []  # 
+g_stats_rows = []  #
+
+## One PG connection, one cursor
 gconn = None
 gcurs = None
 
-##-- examine ENV
+##-- DEBUG examine ENV
 #print( 'os.environ.items')
 #for k,v in os.environ.items():
 #  print( str(k) + ' ' + str(v) )
 #exit(1)
 
 ##- setup for PG connection
-# if 'PGDATABASE' in os.environ:
+#  check ENV for connection details; ERROR if not found
 try:
-  _pgrepo   = os.getenv('PG_REPO')+'/'
-  _src_ddir = os.getenv('SRC_DDIR')+'/'
-  _dst_ddir = os.getenv('DST_DDIR')+'/'
+  _pgrepo     = os.getenv('PG_REPO')+'/'
+  _src_ddir   = os.getenv('SRC_DDIR')+'/'
+  _dst_ddir   = os.getenv('DST_DDIR')+'/'
 
   _pgdb       = os.getenv('PGDATABASE')
   _pghost     = os.getenv('PGHOST')
@@ -46,16 +53,12 @@ g_all_imports = {
     ( 'blockstats.txt','in_stats_raw', 6 )
 }
 
-## tip of the local data_chain
-g_height_imported = 0  # count of imported rows
-
-g_bits_rows  = []  # empty list of response tuples
-g_stats_rows = []  #
-
-g_chainreward  = 0L  #bigInt
-g_chainfee     = 0L
-g_chainsubsidy = 0L
-
+## tip of the local data_chain - 
+##  (to-be-deleted, use the db table)
+# g_height_imported = 0  
+#g_chainreward      = 0L  # explicit bigInt
+#g_chainfee         = 0L
+#g_chainsubsidy     = 0L
 
 ##========================================================
 ##  utils section
@@ -101,20 +104,20 @@ def calculate_energy_price_print(
 #  https://github.com/bitcoin/bitcoin/blob/master/src/arith_uint256.cpp#L203
 # --
 def cbits_to_hexstr( in_text):
-  cbits_hex = int( in_text, 16)
+  cbits_hex       = int( in_text, 16)
   reg_difficulty  = cbits_hex & 0x007FFFFF
-  reg_exp_enc = (cbits_hex & 0xFF000000) >> 24
+  reg_exp_enc     = (cbits_hex & 0xFF000000) >> 24
 
-  exp_const = 1 * 2** (8*(reg_exp_enc-3))
+  exp_const   = 1 * 2** (8*(reg_exp_enc-3))
   exp_varying = reg_difficulty * exp_const
-  bitCnt = ( exp_varying.bit_length() +7)/8
+  byteCnt = ( exp_varying.bit_length() +7)/8  # check count of bytes
   return hex( exp_varying)
 
 #--------------------------------
 def uintstr_to_hexstr( in_text):
-  tStr = in_text
-  tStr = tStr.strip( "\"")
-  tStr = tStr.lstrip("0")
+  tStr   =  in_text
+  tStr   =  tStr.strip( "\"")
+  tStr   =  tStr.lstrip("0")
   return "0x"+tStr
 
 #--------------------------------
@@ -156,6 +159,7 @@ def setup():
     # Called once at program startup time
     #  - establish a PG connection using credentials passed by ENV
     global gcurs, gconn, _src_ddir
+    global _pghost, _pgport, _pgdb, _pguser, _pgpassword
 
     conn_string = "host={} port={} dbname={} user={} password={}".format(
       _pghost, _pgport, _pgdb, _pguser, _pgpassword )
@@ -251,7 +255,7 @@ def do_import_bbits():
       if _verbose: print(str(local_row))
       g_bits_rows.append(local_row)
 
-    if _verbose: print( "str(g_bits_rows)")
+    if _verbose: print( "g_bits_rows len=" + str(len(g_bits_rows)))
     #if _verbose: print( str(g_bits_rows))
     bitstxt_fd.close()
 
@@ -262,7 +266,7 @@ def do_import_bbits():
 #  read and store a text datafile in custom format
 #   rely on table definition in the template; may change
 def do_import_bstats():
-  global g_chainreward, g_chainfee, g_chainsubsidy
+  # global g_chainreward, g_chainfee, g_chainsubsidy
   global _test_mode, g_stats_rows, _verbose
   global gcurs, gconn
 
@@ -277,9 +281,10 @@ def do_import_bstats():
     median_time_str text
   )
   '''
-  comment_SQL = "COMMENT ON TABLE public.in_stats_raw IS 'import blockstats.txt from datafetch 12nov20';"
+  
   ##-=
   try:
+    comment_SQL = "COMMENT ON TABLE public.in_stats_raw IS 'import blockstats.txt from datafetch 12nov20';"
     gcurs.execute( init_stats_SQL )
     gcurs.execute( comment_SQL )
     gconn.commit()
@@ -299,9 +304,9 @@ def do_import_bstats():
     # No startup data file?
     #  init with preformed first row
     ln0_height      = 1
-    ln1_blockhash   = 0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048
-    ln2_subsidy     = 5000000000
-    ln3_totalfee    = 0
+    ln1_blockhash   = '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048'
+    ln2_subsidy     = 5000000000L
+    ln3_totalfee    = 0L
     ln4_median_time = 1231469665
     ln5_block_time  = 1231469665
     local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)
@@ -326,7 +331,7 @@ def do_import_bstats():
     g_stats_rows.append(local_row)
 
 
-  if _verbose: print( "str(g_stats_rows)")
+  if _verbose: print( "g_stats_rows len=" + str(len(g_stats_rows)))
   #if _verbose: print( str(g_stats_rows))
   bitstats_fd.close()
 
@@ -336,29 +341,24 @@ def do_import_bstats():
 ##----------------------------------------
 
 def do_init_data_chain():
-    global g_chainreward, g_chainfee, g_chainsubsidy
-    global _test_mode, g_bits_rows, _verbose
+    #global g_chainreward, g_chainfee, g_chainsubsidy
+    global _verbose  #, _test_mode, g_bits_rows
     global gcurs, gconn
-
-    ## odd-but-true, sums here have been pre-initialized; may change
-    #g_chainreward   = 0L
-    #g_chainfee      = 0L
-    #g_chainsubsidy  = 0L
 
     ##-----------------------------------------------------------------
     init_dc_SQL = '''
     DROP table if exists data_chain cascade;
     CREATE TABLE public.data_chain (
       blockheight integer PRIMARY KEY,
-      blockhash text         ,
-      compact_bits_hex text  ,
-      difficulty float       ,
-      chainwork_hex text     ,
-      chain_reward   bigint  ,
-      chain_subsidy  bigint  ,
-      chain_totalfee bigint  ,
-      median_time    integer ,
-      block_time     integer
+      blockhash        text     ,
+      compact_bits_hex text     ,
+      difficulty       float    ,
+      chainwork_hex    text     ,
+      chain_reward     bigint   ,
+      chain_subsidy    bigint   ,
+      chain_totalfee   bigint   ,
+      median_time      integer  ,
+      block_time       integer
     );
     '''
     try:
@@ -375,10 +375,11 @@ def do_init_data_chain():
 
 #-------------------------------------------------------------
 #  get_block_bits_row
+#    request a row as 1-based $HEIGHT
 #
 def get_block_bits_row( in_height ):
-  global _verbose
-  ## request a row as 1-based $HEIGHT
+  global  g_bits_rows, _verbose
+
   local_height = len(g_bits_rows)
 
   if (in_height <= local_height):
@@ -391,13 +392,13 @@ def get_block_bits_row( in_height ):
   return res_data
 
 
-
 #-------------------------------------------------------------
 #  get_block_stats_row
+#   request a row as 1-based $HEIGHT
 #
 def get_block_stats_row( in_height ):
   global _verbose
-  ## request a row as 1-based $HEIGHT
+
   local_height = len(g_stats_rows)
 
   if (in_height <= local_height):
@@ -411,90 +412,7 @@ def get_block_stats_row( in_height ):
   return res_data
 
 
-#----------------------------------------------------------------
-#def write_block_bits_row( in_row ):
-#  global _verbose
-#  try:
-#    t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
-#    gcurs.execute( t_SQL,
-#        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4]))
-#    gconn.commit()
-#  except Exception, E:
-#    print(str(E))
-#
-#  if _verbose: print('  write_block_bits_row')
-#  return
-
-#----------------------------------------------------------------
-#def write_block_stats_row( in_row ):
-#  global _verbose
-#  try:
-#    t_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
-#    gcurs.execute( t_SQL,
-#        (in_row[0],in_row[1],in_row[2],in_row[3],in_row[4],in_row[5]))
-#    gconn.commit()
-#  except Exception, E:
-#    print(str(E))
-#
-#  if _verbose: print('  write_block_stats_row')
-#  return
-
 ##----------------------------------------
-#def do_make_data_chain_row( in_bits, in_stats):
-#    global _verbose
-#    global g_chainreward, g_chainfee, g_chainsubsidy
-#
-#    sys.exit(1) ## <unused FAIL error
-    ## update aggregate totals
-#    fee = int(in_stats[3])       # ln3_totalfee)
-#    subsidy = int(in_stats[2])   # ln2_subsidy)
-#    g_chainreward = g_chainreward + fee + subsidy
-#    g_chainfee = g_chainfee + fee
-#    g_chainsubsidy = g_chainsubsidy + subsidy
-
-#    if _verbose:
-#      print( '  aggregate totals:')
-#      print( '             fee '+str(type(fee))+' '+str(fee)  )
-#      print( '         subsidy '+str(type(subsidy))+' '+str(subsidy)  )
-#      print( '   g_chainreward'+str(type(g_chainreward))+' '+hex(g_chainreward)  )
-#      print( '      g_chainfee'+str(type(g_chainfee))+' '+hex(g_chainfee)  )
-#      print( '  g_chainsubsidy'+str(type(g_chainsubsidy))+' '+hex(g_chainsubsidy)  )
-
-    ## - SQL data_chain  uses tables already in place
-#    insert_dc_SQL = '''
-#    INSERT into  public.data_chain
-#    SELECT b.height_str::integer ,
-#            b.hash_str ,
-#            cbits_str ,
-#            b.difficulty_str::float ,
-#            chainwork_str ,
-#            %s ,   -- derive this, remove in_btc_raw
-#            %s ,
-#            %s ,
-#            in_stats_raw.median_time_str::integer ,
-#            in_stats_raw.block_time_str::integer
-#      FROM public.in_bits_raw as b
-#      LEFT JOIN
-#        in_stats_raw on (b.height_str = in_stats_raw.height_str)
-#      WHERE b.height_str LIKE %s
-#    '''
-#    try:
-#      tkey = in_bits[0]
-#      gcurs.execute( insert_dc_SQL, ( g_chainreward, g_chainsubsidy, g_chainfee, tkey ) )
-#      gconn.commit()
-#    except Exception, E:
-#      print(str(E))
-
-    ##-------------------
-#    if _verbose: print("  do_make_data_chain_row")
-#    if _verbose: print(  '   '+str(( g_chainreward, g_chainsubsidy, g_chainfee, tkey )) )
-#    return
-
-
-##----------------------------------------
-#res_height, g_chainreward, g_chainfee, g_chainsubsidy = do_next_block( 
-#         highest_block_in_pgdb,
-#         g_chainreward, g_chainfee, g_chainsubsidy )
 
 def INSERT_block_to_pgdb( in_blockheight ):
     global gcurs, gconn
@@ -502,8 +420,6 @@ def INSERT_block_to_pgdb( in_blockheight ):
     global _verbose #, g_height_imported
 
     ##  TEST current $HEIGHT up to date?
-    ##
-    ##  -- get highest block already known
     ##
     ##  -- ask for $HEIGHT+1
     ##  --   if EMPTY return
@@ -517,14 +433,15 @@ def INSERT_block_to_pgdb( in_blockheight ):
     ##        insert row into raw tables (for sanity / logging)
 
     ##---------------------------------------------
-    ##if ( not in_blockheight > 0):
-    ##    print( 'ERR: '+str(in_blockheight))
-    ##    return
+    ##  $HEIGHT is one or greater, ERROR otherwise
+    if ( not in_blockheight > 0):
+        print( 'ERR: '+str(in_blockheight))
+        return
 
     ##=======================================================
     ## MONDAY hack -----
 
-    ## ask for a new block row
+    ## ask for a new BLOCK row
     ##   if none, sleep and return
     block_bits_row = get_block_bits_row( in_blockheight+1 )
     if block_bits_row is None or block_bits_row == '':
@@ -533,7 +450,7 @@ def INSERT_block_to_pgdb( in_blockheight ):
         return   # nothing to do
 
 
-    ##--- We know that there is a new BLOCK available
+    ##--- A new BLOCK is available
     ##     get the last known row for accumulators
 
     get_datachain_row_SQL = '''
@@ -636,7 +553,9 @@ def do_main_loop():
     global _verbose   #g_height_imported
 
     while True:
-      ## qry the data_chain table, if there are no entries, ask for HEIGHT 1
+      ##  query the data_chain table
+      ##   get highest block already known and recorded
+      ##
       ##  note: if there are no data_chain rows yet, MAX() returns NULL
       ##   if max() is NULL , pass a blockheight = 1
       ##   all other cases, pass the MAX known data_chain height
@@ -655,12 +574,7 @@ def do_main_loop():
 
       if _verbose: 
         print('do_main_loop- highest_block_in_pgdb: '+str(highest_block_in_pgdb))
-      # next_block = {}
-      # next_block = fetch_block( highest_block_in_pgdb + 1)
-      # if not found
-      #   sleep, do nothing
-      # else
-      #   insert_block_pgdb ( highest_block_in_pgdb + 1, next_block[in_fee], next_block[in_subsidy] , whatever else)
+
       INSERT_block_to_pgdb( highest_block_in_pgdb )
 
     ## done
