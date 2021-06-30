@@ -471,17 +471,22 @@ def INSERT_block_to_pgdb( in_blockheight ):
         time.sleep(10)
         return   # nothing to do
 
+    block_stats_row = get_block_stats_row( in_blockheight+1 )
 
-    ##--- A new BLOCK is available
-    ##     get the last known row for accumulators
+    ##--- A new BLOCK is available  ------------------------------
+    
+    ## explicit initialization to ensure variable type long integer
+    local_chainreward  = 0L
+    local_chainfee     = 0L
+    local_chainsubsidy = 0L
 
+    ##  get accumulator variables from last recorded data_chain row 
     get_datachain_row_SQL = '''
-      SELECT   chain_reward, chain_subsidy, chain_totalfee 
+      SELECT   chain_reward, chain_totalfee, chain_subsidy 
         FROM   public.data_chain 
        WHERE   blockheight = %s
     '''
   
-    ##-=
     try:
       gcurs.execute( get_datachain_row_SQL, (in_blockheight,) )
       res_qry = gcurs.fetchone()
@@ -491,30 +496,28 @@ def INSERT_block_to_pgdb( in_blockheight ):
     except Exception, E:
       print(str(E))
 
-    local_chainreward  = 0L
-    local_chainfee     = 0L
-    local_chainsubsidy = 0L
+    ## use the data_chain row as the source for values
+    local_chainreward  = long(res_qry[0])
+    local_chainfee     = long(res_qry[1])
+    local_chainsubsidy = long(res_qry[2])
 
-    block_stats_row = get_block_stats_row( in_blockheight+1 )
+    ## height, blockhash, subsidy, totalfee, time, mediantime
+    fee     = long( block_stats_row[3])   # ln3_totalfee)
+    subsidy = long( block_stats_row[2])   # ln2_subsidy)
 
-    ## CHANGE HERE - use the data_chain row as the source for values
-    ## record the new block row
-    #write_block_bits_row( block_bits_row)
-    fee     = int( res_qry[2])   # ln3_totalfee)
-    subsidy = int( res_qry[1])   # ln2_subsidy)
-
-    out_chainreward = in_chainreward + fee + subsidy
-    out_chainfee = in_chainfee + fee
-    out_chainsubsidy = g_chainsubsidy + subsidy
+    local_chainreward  = local_chainreward + fee + subsidy
+    local_chainfee     = in_chainfee + fee
+    local_chainsubsidy = g_chainsubsidy + subsidy
 
     if _verbose:
-      print( '  aggregate totals:')
-      print( '             fee '+str(type(fee))+' '+str(fee)  )
-      print( '         subsidy '+str(type(subsidy))+' '+str(subsidy)  )
-      print( '   out_chainreward'+str(type(out_chainreward))+' '+hex(out_chainreward)  )
-      print( '      out_chainfee'+str(type(out_chainfee))+' '+hex(out_chainfee)  )
-      print( '  out_chainsubsidy'+str(type(out_chainsubsidy))+' '+hex(out_chainsubsidy)  )
+      print( '   aggregate totals:')
+      print( '              fee '+str(type(fee))+' '+str(fee)  )
+      print( '          subsidy '+str(type(subsidy))+' '+str(subsidy)  )
+      print( '   local_chainreward'+str(type(local_chainreward))+' '+hex(local_chainreward)  )
+      print( '      local_chainfee'+str(type(local_chainfee))+' '+hex(local_chainfee)  )
+      print( '  local_chainsubsidy'+str(type(local_chainsubsidy))+' '+hex(local_chainsubsidy)  )
 
+    ## write logging tables
     try:
       t_bits_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
       gcurs.execute( t_bits_SQL,
@@ -529,9 +532,6 @@ def INSERT_block_to_pgdb( in_blockheight ):
         (block_stats_row[0],block_stats_row[1],block_stats_row[2],block_stats_row[3],block_stats_row[4],block_stats_row[5]))
 
       ## calc and write data_chain row
-      #do_make_data_chain_row( block_bits_row, block_stats_row )
-
-      ## update aggregate totals
 
       ## - SQL data_chain  uses tables already in place
       insert_dc_SQL = '''
