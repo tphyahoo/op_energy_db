@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+
+  A single-file python tool to read and store select  BLOCK info
+
+    requires: postgresql and a driver shell script for setup
+
 Created on Sun Jun 13 06:10:03 2021
 
 @author: thartman, dbb
@@ -13,10 +18,10 @@ import psycopg2
 ##  global variables
 
 # in-memory logging tables
-g_bits_rows  = []  # 
+g_bits_rows  = []  #
 g_stats_rows = []  #
 
-## One PG connection, one cursor
+## One PostgreSQL connection, one SQL cursor
 gconn = None
 gcurs = None
 
@@ -53,9 +58,9 @@ g_all_imports = {
     ( 'blockstats.txt','in_stats_raw', 6 )
 }
 
-## tip of the local data_chain - 
+## tip of the local data_chain -
 ##  (to-be-deleted, use the db table)
-# g_height_imported = 0  
+#g_height_imported = 0
 #g_chainreward      = 0L  # explicit bigInt
 #g_chainfee         = 0L
 #g_chainsubsidy     = 0L
@@ -281,7 +286,7 @@ def do_import_bstats():
     median_time_str text
   )
   '''
-  
+
   ##-=
   try:
     gcurs.execute( init_stats_SQL )
@@ -297,7 +302,7 @@ def do_import_bstats():
     bitstats_fd = open( _dst_ddir+'blockstats.txt', 'r' )
   except Exception, E:
     print( str(E) )
-  
+
   if bitstats_fd is None:
     # No startup data file?
     #  init with preformed first row
@@ -382,8 +387,8 @@ def do_init_data_chain():
        blockheight, blockhash,
        compact_bits_hex, difficulty, chainwork_hex,
        chain_reward, chain_subsidy, chain_totalfee, median_time, block_time)
-    VALUES ( 1, '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
-      '0x1d00ffff', 1.0, '0x200020002', 
+    VALUES (  1, '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
+        '0x1d00ffff', 1.0, '0x200020002',
          5000000000, 5000000000, 0, 1231469665, 1231469665 );
     '''
     try:
@@ -391,7 +396,7 @@ def do_init_data_chain():
       gconn.commit()
     except Exception, E:
       print(str(E))
- 
+
     return
 
 
@@ -453,11 +458,11 @@ def INSERT_block_to_pgdb( in_blockheight ):
     ##
     ##  -- INSERT data
     ##        insert row into raw tables (for sanity / logging)
-
+    ##
     ##---------------------------------------------
     ##  $HEIGHT is one or greater, ERROR otherwise
     if ( not in_blockheight > 0):
-        print( 'ERR: '+str(in_blockheight))
+        print( 'ERR: block height '+str(in_blockheight))
         return
 
     ##=======================================================
@@ -469,24 +474,24 @@ def INSERT_block_to_pgdb( in_blockheight ):
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
         time.sleep(10)
-        return   # nothing to do
+        return   #  no new block; nothing to do
 
     block_stats_row = get_block_stats_row( in_blockheight+1 )
 
     ##--- A new BLOCK is available  ------------------------------
-    
+
     ## explicit initialization to ensure variable type long integer
     local_chainreward  = 0L
     local_chainfee     = 0L
     local_chainsubsidy = 0L
 
-    ##  get accumulator variables from last recorded data_chain row 
+    ##  get accumulator variables from last recorded data_chain row
     get_datachain_row_SQL = '''
-      SELECT   chain_reward, chain_totalfee, chain_subsidy 
-        FROM   public.data_chain 
+      SELECT   chain_reward, chain_totalfee, chain_subsidy
+        FROM   public.data_chain
        WHERE   blockheight = %s
     '''
-  
+
     try:
       gcurs.execute( get_datachain_row_SQL, (in_blockheight,) )
       res_qry = gcurs.fetchone()
@@ -496,11 +501,12 @@ def INSERT_block_to_pgdb( in_blockheight ):
     except Exception, E:
       print(str(E))
 
-    ## use the data_chain row as the source for values
+    ## use the data_chain row as the source for accumulated values
     local_chainreward  = long(res_qry[0])
     local_chainfee     = long(res_qry[1])
     local_chainsubsidy = long(res_qry[2])
 
+    ## get fee info from in-memory list
     ## height, blockhash, subsidy, totalfee, time, mediantime
     fee     = long( block_stats_row[3])   # ln3_totalfee)
     subsidy = long( block_stats_row[2])   # ln2_subsidy)
@@ -524,9 +530,7 @@ def INSERT_block_to_pgdb( in_blockheight ):
         (block_bits_row[0],block_bits_row[1],block_bits_row[2],block_bits_row[3],block_bits_row[4]))
       #if _verbose: print('  write_block_bits_row')
 
-      ## get and record a stats row, may require the hash value from step1
-      #write_block_stats_row( block_stats_row)
-
+      ## get and record a stats row
       t_stats_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
       gcurs.execute( t_stats_SQL,
         (block_stats_row[0],block_stats_row[1],block_stats_row[2],block_stats_row[3],block_stats_row[4],block_stats_row[5]))
@@ -551,7 +555,7 @@ def INSERT_block_to_pgdb( in_blockheight ):
           in_stats_raw on (b.height_str = in_stats_raw.height_str)
         WHERE b.height_str LIKE %s
       '''
-      tkey = block_bits_row[0]  ##<- CHECK THIS 
+      tkey = block_bits_row[0]  ##<- CHECK THIS
       gcurs.execute( insert_dc_SQL, ( out_chainreward, out_chainsubsidy, out_chainfee, tkey ) )
 
       gconn.commit()
