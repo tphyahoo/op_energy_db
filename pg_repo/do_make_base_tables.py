@@ -230,11 +230,11 @@ def do_import_bbits():
     if bitstxt_fd is None:
       # No startup data file?
       #  init with preformed first row
-      ln0_height      = 1
-      ln1_blockhash   = 0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048
-      ln2_cbits     = '0x1d00ffff'
+      ln0_height        = 1
+      ln1_blockhash     = '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048'
+      ln2_cbits         = '0x1d00ffff'
       ln3_difficulty    = 1.0
-      ln4_chainwork = '0x200020002'
+      ln4_chainwork     = '0x200020002'
       local_row = (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork )
       g_bits_rows.append(local_row)
       return
@@ -370,6 +370,21 @@ def do_init_data_chain():
       print(str(E))
 
     ## -----------------
+    init_datachain_SQL = '''
+    INSERT into public.data_chain(
+       blockheight, blockhash,
+       compact_bits_hex, difficulty, chainwork_hex,
+       chain_reward, chain_subsidy, chain_totalfee, median_time, block_time)
+    VALUES ( 1, '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
+      '0x1d00ffff', 1.0, '0x200020002', 
+         5000000000, 0, 1231469665, 1231469665 );
+    '''
+    try:
+      gcurs.execute( init_datachain_SQL )
+      gconn.commit()
+    except Exception, E:
+      print(str(E))
+ 
     return
 
 
