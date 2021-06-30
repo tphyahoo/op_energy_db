@@ -432,7 +432,7 @@ def do_init_data_chain():
       ln5_block_time  = 1231469665
 
       try:
-        t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s,%s)"
+        t_SQL = "INSERT into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
         gcurs.execute( t_SQL,
           (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_median_time,ln5_block_time))
         gconn.commit()
