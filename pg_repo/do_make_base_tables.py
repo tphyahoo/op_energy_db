@@ -506,16 +506,21 @@ def INSERT_block_to_pgdb( in_blockheight ):
     try:
       gcurs.execute( get_datachain_row_SQL, (in_blockheight,) )
       res_qry = gcurs.fetchone()
-      #
       if _verbose: print( 'DEBUG get_datachain_row_SQL = ' )
       if _verbose: print( '  '+str(res_qry)+';')
     except Exception, E:
       print(str(E))
 
     ## use the data_chain row as the source for accumulated values
-    local_chainreward  = long(res_qry[0])
-    local_chainfee     = long(res_qry[1])
-    local_chainsubsidy = long(res_qry[2])
+    ##  only the first row will not have a data_chain entry yet
+    if res_qry[0] is None:
+      local_chainreward  = 5000000000L
+      local_chainfee     = 0L
+      local_chainsubsidy = 5000000000L
+    else:
+      local_chainreward  = long(res_qry[0])
+      local_chainfee     = long(res_qry[1])
+      local_chainsubsidy = long(res_qry[2])
 
     ## get fee info from in-memory list
     ## height, blockhash, subsidy, totalfee, time, mediantime
