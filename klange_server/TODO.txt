@@ -1,0 +1,62 @@
+
+
+in http://dev.bergain.biz:3001/opdev/sw_op_energy/src/branch/master/pg_repo
+
+-- in readme, have something like name_of_csv_files_dir_YYYYMMDD.tar.gz and the hash of this large tar file.
+-- have build that creates data_chain.sql
+
+**********
+
+add to README at 
+
+http://dev.bergain.biz:3001/opdev/op_klange_server
+
+web api.
+url schema for direct getting csvs.
+url schema for getting charts.
+
+(we had this before, might need backporting)
+
+**********
+
+log and linear modes
+
+linear mode, y axis says hashes per satoshi
+log mode, y axis says log(hashes per satoshi)
+
+I'm thinking you could display both charts on the charting link.
+12:48 PM
+
+implement this by adding a log(price) field in the csv. then should be easy.
+
+***********
+
+done by adding an input to the form -- this json
+
+{'idBeg': '1', 'idEnd': '700000', 'makeChartname': 'Chart', 'inc': '1000'}
+
+should include all parameters that are handled by code. currently it's missing span, which defaults to 2016
+
+**********
+
+bug in chart that includes a bunch of vertical and diagonal lines, strange artifacts.
+to reproduce:
+  block 1 to 700,000 (all time)
+  inc: 10000
+
+maybe this is because of matplotlib log chart, and it will go away after doing the log and linear modes task
+
+http://dev.bergain.biz:7888/bin/aconcagua.py?idBeg=1&inc=10000&idEnd=700000&makeChartname=Chart
+http://dev.bergain.biz:7888/images/chart3_1-2016-1000-700000.png
+
+**********
+
+use ssh keys instead of passwords
+
+##-------------------------
+URGENT ?
+IMPORTANT ?
+LOW-HANGING FRUIT ?
+
+rate these issues by sorting
+##--------------------------------
