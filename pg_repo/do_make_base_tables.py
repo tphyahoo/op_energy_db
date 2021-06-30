@@ -384,7 +384,7 @@ def do_init_data_chain():
        chain_reward, chain_subsidy, chain_totalfee, median_time, block_time)
     VALUES ( 1, '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048',
       '0x1d00ffff', 1.0, '0x200020002', 
-         5000000000, 0, 1231469665, 1231469665 );
+         5000000000, 5000000000, 0, 1231469665, 1231469665 );
     '''
     try:
       gcurs.execute( init_datachain_SQL )
