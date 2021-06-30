@@ -556,7 +556,7 @@ def INSERT_block_to_pgdb( in_blockheight ):
         WHERE b.height_str LIKE %s
       '''
       tkey = block_bits_row[0]  ##<- CHECK THIS
-      gcurs.execute( insert_dc_SQL, ( out_chainreward, out_chainsubsidy, out_chainfee, tkey ) )
+      gcurs.execute( insert_dc_SQL, ( local_chainreward, local_chainsubsidy, local_chainfee, tkey ) )
 
       gconn.commit()
     except Exception, E:
