@@ -652,7 +652,7 @@ def do_main_loop():
         print('do_main_loop- highest_block_in_pgdb: '+str(highest_block_in_pgdb))
         print('              data_chain rows: '+str(row_count))
 
-      INSERT_block_to_pgdb( row_cnt, highest_block_in_pgdb )
+      INSERT_block_to_pgdb( row_count, highest_block_in_pgdb )
 
     ## done
     return
