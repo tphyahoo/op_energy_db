@@ -255,7 +255,7 @@ def do_import_bbits():
       if _verbose: print(str(local_row))
       g_bits_rows.append(local_row)
 
-    if _verbose: print( "g_bits_rows len=" + str(len(g_bits_rows)))
+    if _verbose: print( "INIT g_bits_rows len=" + str(len(g_bits_rows)))
     #if _verbose: print( str(g_bits_rows))
     bitstxt_fd.close()
 
@@ -284,9 +284,7 @@ def do_import_bstats():
   
   ##-=
   try:
-    comment_SQL = "COMMENT ON TABLE public.in_stats_raw IS 'import blockstats.txt from datafetch 12nov20';"
     gcurs.execute( init_stats_SQL )
-    gcurs.execute( comment_SQL )
     gconn.commit()
   except Exception, E:
     print(str(E))
@@ -313,6 +311,14 @@ def do_import_bstats():
     g_stats_rows.append(local_row)
     return
 
+  ##-= got a seed datafile, add a table comment and load data into RAM
+  try:
+    comment_SQL = "COMMENT ON TABLE public.in_stats_raw IS 'import blockstats.txt from datafetch 12nov20';"
+    gcurs.execute( comment_SQL )
+    gconn.commit()
+  except Exception, E:
+    print(str(E))
+
   while True:
     ln0_height = bitstats_fd.readline()
     if (cmp( ln0_height, '') == 0):
@@ -331,7 +337,7 @@ def do_import_bstats():
     g_stats_rows.append(local_row)
 
 
-  if _verbose: print( "g_stats_rows len=" + str(len(g_stats_rows)))
+  if _verbose: print( "INIT g_stats_rows len=" + str(len(g_stats_rows)))
   #if _verbose: print( str(g_stats_rows))
   bitstats_fd.close()
 
@@ -369,7 +375,8 @@ def do_init_data_chain():
     except Exception, E:
       print(str(E))
 
-    ## -----------------
+    ## -------------------------------------------------------------
+    ##  to simplify the main loop, there is always one row to start
     init_datachain_SQL = '''
     INSERT into public.data_chain(
        blockheight, blockhash,
@@ -412,7 +419,7 @@ def get_block_bits_row( in_height ):
 #   request a row as 1-based $HEIGHT
 #
 def get_block_stats_row( in_height ):
-  global _verbose
+  global g_stats_rows, _verbose
 
   local_height = len(g_stats_rows)
 
@@ -431,7 +438,7 @@ def get_block_stats_row( in_height ):
 
 def INSERT_block_to_pgdb( in_blockheight ):
     global gcurs, gconn
-    #global g_chainreward, g_chainfee, g_chainsubsidy
+    global g_bits_rows, g_stats_rows
     global _verbose #, g_height_imported
 
     ##  TEST current $HEIGHT up to date?
@@ -477,17 +484,16 @@ def INSERT_block_to_pgdb( in_blockheight ):
     ##-=
     try:
       gcurs.execute( get_datachain_row_SQL, (in_blockheight,) )
-      gconn.commit()
       res_qry = gcurs.fetchone()
       #
-      if _verbose: print( 'DEBUG get_datachain_row_SQL = ' + str(res_qry) )
-      if _verbose: print( str(res_qry)+'-')
+      if _verbose: print( 'DEBUG get_datachain_row_SQL = ' )
+      if _verbose: print( '  '+str(res_qry)+';')
     except Exception, E:
       print(str(E))
 
-    out_chainreward = 0L
-    out_chainfee = 0L
-    out_chainsubsidy = 0L
+    local_chainreward  = 0L
+    local_chainfee     = 0L
+    local_chainsubsidy = 0L
 
     block_stats_row = get_block_stats_row( in_blockheight+1 )
 
