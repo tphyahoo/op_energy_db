@@ -251,6 +251,7 @@ def do_import_bbits():
     except Exception, E:
       print(str(E))
 
+    if _verbose: print('local_row (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork)')
     while True:
       ln0_height = bitstxt_fd.readline()
       if (cmp( ln0_height, '') == 0):
@@ -263,7 +264,6 @@ def do_import_bbits():
       ln4_chainwork   =  uintstr_to_hexstr( bitstxt_fd.readline().strip() )
 
       local_row = (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork )
-      if _verbose: print('local_row (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork)')
       if _verbose: print(str(local_row))
       g_bits_rows.append(local_row)
 
@@ -332,6 +332,7 @@ def do_import_bstats():
   except Exception, E:
     print(str(E))
 
+  if _verbose: print('(ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)')
   while True:
     ln0_height = bitstats_fd.readline()
     if (cmp( ln0_height, '') == 0):
@@ -345,7 +346,6 @@ def do_import_bstats():
     ln5_mediantime  =  bitstats_fd.readline().strip()
 
     local_row = (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)
-    if _verbose: print('(ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)')
     if _verbose: print(str(local_row))
     g_stats_rows.append(local_row)
 
