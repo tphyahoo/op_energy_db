@@ -157,14 +157,14 @@ if ( not os.path.isfile( '/tmp/'+dst_file) ):
   PGPORT=5432
   import psycopg2 as pg
   try:
-    conn  = pg.connect("dbname=btc_op_energy port="+str(PGPORT))
+    conn  = pg.connect("dbname=op_energy_db port="+str(PGPORT))
     curs = conn.cursor()
   except pg.OperationalError as e:
     print('#psycopg2: '+str(e))
     sys.exit(-1)
 
   tSQL_pre = '''  COPY
-  (SELECT calcops_28( a.blkheight, a.median_time, a.chain_reward, a.chainwork_hex,
+  (SELECT calculate_energy_price( a.blkheight, a.median_time, a.chain_reward, a.chainwork_hex,
                      b.blkheight, b.median_time, b.chain_reward, b.chainwork_hex),
                      b.blkheight, b.median_time
   FROM data_chain as a, data_chain as b  WHERE
