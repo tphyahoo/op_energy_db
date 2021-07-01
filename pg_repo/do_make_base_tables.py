@@ -392,38 +392,6 @@ def do_init_data_chain():
       except Exception, E:
         print(str(E))
 
-      ## -- always include row 1   bits
-      ln0_height        = 1
-      ln1_blockhash     = '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048'
-      ln2_cbits         = '0x1d00ffff'
-      ln3_difficulty    = 1.0
-      ln4_chainwork     = '0x200020002'
-
-      try:
-        t_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
-        gcurs.execute( t_SQL,
-          (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork))
-        gconn.commit()
-      except Exception, E:
-        print(str(E))
-
-      if _verbose: print('  write_block_bits_row')
-
-      ## -- always include row 1   stats
-      ln0_height      = 1
-      ln1_blockhash   = '0x839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048'
-      ln2_subsidy     = 5000000000L
-      ln3_totalfee    = 0L
-      ln4_median_time = 1231469665
-      ln5_block_time  = 1231469665
-
-      try:
-        t_SQL = "INSERT into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
-        gcurs.execute( t_SQL,
-          (ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_median_time,ln5_block_time))
-        gconn.commit()
-      except Exception, E:
-        print(str(E))
 
     ##-- done init data_chain
     return
