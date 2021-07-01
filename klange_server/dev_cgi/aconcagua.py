@@ -239,7 +239,6 @@ if tD.get('makeChartname') is not None:
        'verticalalignment': 'bottom',
        'horizontalalignment': 'center'}
 
-
     tDateStr = ''
     tElemLast = df_ex0.shape[0] -1
     tDateBegStr = datetime.utcfromtimestamp(  df_ex0.at[   0, 'median_time']      ).strftime("%Y-%m-%d %H:%M")
