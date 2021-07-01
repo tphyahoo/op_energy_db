@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
-#  aconcagua   -- return form
-#  aconcagua?
-#    idBeg   span  idEnd  mimetype  chartopts
-#--
+#  /bin/aconcagua   -- return form         OR
+#  /bin/aconcagua?idBeg=0000&idEnd=00000
+#
+#    { idBeg,  span, idEnd,  mimetype,  chartopts }
+#
+#     where idBeg < idEnd; both are valid $HEIGHT
+#    
+#-----------------------------------------------------------
 
 import os, sys
 import json, re, random
