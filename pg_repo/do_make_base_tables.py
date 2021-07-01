@@ -387,7 +387,7 @@ def do_init_data_chain():
     except Exception, E:
       print(str(E))
 
-
+    # this looks wrong, shouldn't need to insert a row at init time, for any tables.
     if ( True ):  #len(g_bits_rows) == 1 ):
       ## -------------------------------------------------------------
       ##  to simplify the main loop, there is always one row to start
@@ -569,13 +569,13 @@ def INSERT_block_to_pgdb( lowest_block_not_in_pgdb ):
 
     try:
       ## -- write logging table   bits
-      t_bits_SQL = "INSERT into public.in_bits_raw values ( %s,%s,%s,%s,%s)"
+      t_bits_SQL = "INSERT into public.in_bits_raw ( height_str , hash_str , cbits_str , difficulty_str , chainwork_str  ) values ( %s,%s,%s,%s,%s)"
       gcurs.execute( t_bits_SQL,
         (block_bits_row[0],block_bits_row[1],block_bits_row[2],block_bits_row[3],block_bits_row[4]))
       #if _verbose: print('  write_block_bits_row')
 
       ## -- write logging table   stats
-      t_stats_SQL = "insert into public.in_stats_raw values ( %s,%s,%s,%s,%s,%s)"
+      t_stats_SQL = "insert into public.in_stats_raw ( height_str, hash_str , block_subsidy_str , block_totalfee_str , block_time_str , median_time_str ) values ( %s,%s,%s,%s,%s,%s)"
       gcurs.execute( t_stats_SQL,
         (block_stats_row[0],block_stats_row[1],block_stats_row[2],block_stats_row[3],block_stats_row[4],block_stats_row[5]))
 
