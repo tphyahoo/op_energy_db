@@ -579,27 +579,14 @@ def INSERT_block_to_pgdb( lowest_block_not_in_pgdb ):
       gcurs.execute( t_stats_SQL,
         (block_stats_row[0],block_stats_row[1],block_stats_row[2],block_stats_row[3],block_stats_row[4],block_stats_row[5]))
 
-      ## -- calc and write       data_chain
-      ##    - SQL data_chain  uses tables already in place  TODO rewrite 
+       ## -- calc and write       data_chain
       insert_dc_SQL = '''
-      INSERT into  public.data_chain
-      SELECT b.height_str::integer ,
-            b.hash_str ,
-            cbits_str ,
-            b.difficulty_str::float ,
-            chainwork_str ,
-            %s ,   -- derive this, remove in_btc_raw
-            %s ,
-            %s ,
-            in_stats_raw.median_time_str::integer ,
-            in_stats_raw.block_time_str::integer
-        FROM public.in_bits_raw as b
-        LEFT JOIN
-          in_stats_raw on (b.height_str = in_stats_raw.height_str)
-        WHERE b.height_str LIKE %s
+      INSERT into  public.data_chain  ( blockheight , blockhash , compact_bits_hex , difficulty , chainwork_hex , chain_reward , chain_subsidy , chain_totalfee , median_time , block_time )
+                                      values ( %s,%s,%s,%s,%s,%s,%s,%s,%s,%s )
       '''
-      tkey = block_bits_row[0]  ##<- CHECK THIS
-      gcurs.execute( insert_dc_SQL, ( local_chainreward, local_chainsubsidy, local_chainfee, tkey ) )
+      gcurs.execute( insert_dc_SQL, ( block_bits_row[0] , block_bits_row[1], block_bits_row[2], block_bits_row[3], block_bits_row[4],
+                                      local_chainreward, local_chainsubsidy, local_chainfee,
+                                      block_stats_row[5], block_stats_row[4] ) )
 
       gconn.commit()
     except Exception, E:
