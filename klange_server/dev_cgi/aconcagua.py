@@ -172,7 +172,7 @@ if ( not os.path.isfile( '/tmp/'+dst_file) ):
                      b.blockheight, b.median_time, b.chain_reward, b.chainwork_hex),
                      b.blockheight, b.median_time
   FROM data_chain as a, data_chain as b  WHERE
-    a.blockheight > %s AND a.blockheight %% %s = 0  AND  a.blockheight < %s AND
+    a.blockheight >= %s AND a.blockheight %% %s = 0  AND  a.blockheight <= %s AND
     b.blockheight = (a.blockheight+%s)  AND b.median_time <> a.median_time ) to
 
   '''
