@@ -243,13 +243,7 @@ def do_import_bbits():
       g_bits_rows.append(local_row)
       return
 
-    ##-= got a seed datafile, add a table comment and load data into RAM
-    try:
-      comment_SQL = "COMMENT ON TABLE public.in_bits_raw IS 'import blockbits.txt from datafetch 12nov20';"
-      gcurs.execute( comment_SQL )
-      gconn.commit()
-    except Exception, E:
-      print(str(E))
+    ##-= got a seed datafile and load data into RAM
 
     if _verbose: print('local_row (ln0_height,ln1_blockhash,ln2_cbits,ln3_difficulty,ln4_chainwork)')
     while True:
@@ -324,13 +318,7 @@ def do_import_bstats():
     g_stats_rows.append(local_row)
     return
 
-  ##-= got a seed datafile, add a table comment and load data into RAM
-  try:
-    comment_SQL = "COMMENT ON TABLE public.in_stats_raw IS 'import blockstats.txt from datafetch 12nov20';"
-    gcurs.execute( comment_SQL )
-    gconn.commit()
-  except Exception, E:
-    print(str(E))
+  ##-= got a seed datafile, and load data into RAM
 
   if _verbose: print('(ln0_height,ln1_blockhash,ln2_subsidy,ln3_totalfee,ln4_time,ln5_mediantime)')
   while True:
@@ -380,9 +368,7 @@ def do_init_data_chain():
     );
     '''
     try:
-      comment_SQL = "COMMENT ON TABLE public.data_chain IS '-v0-0';"
       gcurs.execute( init_dc_SQL )
-      gcurs.execute( comment_SQL )
       gconn.commit()
     except Exception, E:
       print(str(E))
