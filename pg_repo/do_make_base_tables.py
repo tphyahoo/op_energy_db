@@ -483,14 +483,10 @@ def get_block_stats_row( in_row ):
 
 
 ##----------------------------------------
-def INSERT_block_to_pgdb( in_row_cnt, in_blockheight ):
+def INSERT_block_to_pgdb( lowest_block_not_in_pgdb ):
     global gcurs, gconn
     global g_bits_rows, g_stats_rows
     global _verbose #, g_height_imported
-
-    if ( not in_blockheight > 0):
-        print( 'ERR: block height '+str(in_blockheight))
-        return
 
     ##  TEST current $HEIGHT up to date?
     ##
@@ -513,13 +509,13 @@ def INSERT_block_to_pgdb( in_row_cnt, in_blockheight ):
 
     ## ask for a new BLOCK row
     ##   if none, sleep and return
-    block_bits_row = get_block_bits_row( in_row_cnt )
+    block_bits_row = get_block_bits_row( lowest_block_not_in_pgdb )
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
         time.sleep(10)
         return   #  no new block; nothing to do
 
-    block_stats_row = get_block_stats_row( in_row_cnt )
+    block_stats_row = get_block_stats_row( lowest_block_not_in_pgdb )
 
     ##--- A new BLOCK is available  ------------------------------
 
@@ -535,7 +531,7 @@ def INSERT_block_to_pgdb( in_row_cnt, in_blockheight ):
        WHERE   blockheight = %s
     '''
     try:
-      gcurs.execute( get_datachain_row_SQL, (in_blockheight,) )
+      gcurs.execute( get_datachain_row_SQL, (lowest_block_not_in_pgdb -1,) )
       res_qry = gcurs.fetchone()
       if _verbose: print( 'DEBUG get_datachain_row_SQL = ' )
       if _verbose: print( '  '+str(res_qry)+';')
@@ -625,14 +621,14 @@ def do_main_loop():
       ##   get highest block already known and recorded
       ##
 
-      try:
-        qry_SQL = "SELECT count(*) from data_chain"
-        gcurs.execute( qry_SQL )
-        row_count = gcurs.fetchone()[0]
+      #try:
+      #  qry_SQL = "SELECT count(*) from data_chain"
+      #  gcurs.execute( qry_SQL )
+      #  row_count = gcurs.fetchone()[0]
         
-      except Exception, E:
-        print(str(E))
-        sys.exit(-1)
+      #except Exception, E:
+      #  print(str(E))
+      #  sys.exit(-1)
       ##---------------------------------------------------
       try:
         qry_SQL = "SELECT max(blockheight) from data_chain"
@@ -642,20 +638,22 @@ def do_main_loop():
         res_qry = gcurs.fetchone()
         if res_qry[0] is not None:
           highest_block_in_pgdb = int(res_qry[0])
+          lowest_block_not_in_pgdb = int(res_qry[0]) + 1
         else:
-          highest_block_in_pgdb = 1
+          lowest_block_not_in_pgdb = 1
       except Exception, E:
         print(str(E))
         sys.exit(-1)
 
       if _verbose:
-        print('do_main_loop- highest_block_in_pgdb: '+str(highest_block_in_pgdb))
-        print('              data_chain rows: '+str(row_count))
+        print('do_main_loop- lowest_block_not_in_pgdb: '+str(lowest_block_not_in_pgdb))
+        #print('              data_chain rows: '+str(row_count))
 
-      INSERT_block_to_pgdb( row_count +1, highest_block_in_pgdb )
+      INSERT_block_to_pgdb( lowest_block_not_in_pgdb )
 
     ## done
     return
+
 
 ##-----------------------------------------------------------
 ##  MAIN -- make it so
