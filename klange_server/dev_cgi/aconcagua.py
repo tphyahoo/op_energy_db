@@ -6,7 +6,7 @@
 #    { idBeg,  span, idEnd,  mimetype,  chartopts }
 #
 #     where idBeg < idEnd; both are valid $HEIGHT
-#    
+#
 #-----------------------------------------------------------
 
 import os, sys
