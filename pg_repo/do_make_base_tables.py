@@ -613,8 +613,7 @@ def INSERT_block_to_pgdb( lowest_block_not_in_pgdb ):
 
 ##----------------------------------------------------------------
 def do_main_loop():
-    #global g_chainreward, g_chainfee, g_chainsubsidy
-    global _verbose   #g_height_imported
+    global _verbose 
 
     while True:
       # if data_chain has no data, fetch and insert block 1, since blockchain index starts there. otherwise fetch and insert max block + 1.
@@ -635,8 +634,6 @@ def do_main_loop():
       if _verbose:
         print('do_main_loop- lowest_block_not_in_pgdb: '+str(lowest_block_not_in_pgdb))
       INSERT_block_to_pgdb( lowest_block_not_in_pgdb )
-
-    ## done
     return
 
 
