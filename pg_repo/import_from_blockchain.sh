@@ -47,7 +47,8 @@ done
 export SRC_DDIR=/var/local/opdev/
 
 if [[ ${SDEBUG} == 'true' ]]; then
-  SRC_DATAFILE=btcdata_1600585200_small.tgz
+  SRC_DATAFILE=btcdata_1600585200_onehundred.tgz
+#  SRC_DATAFILE=btcdata_1600585200_small.tgz
 else
   SRC_DATAFILE=btcdata_1600585200.tgz
 fi
