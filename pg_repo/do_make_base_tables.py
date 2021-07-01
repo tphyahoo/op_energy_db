@@ -617,27 +617,14 @@ def do_main_loop():
     global _verbose   #g_height_imported
 
     while True:
-      ##  query the data_chain table
-      ##   get highest block already known and recorded
-      ##
-
-      #try:
-      #  qry_SQL = "SELECT count(*) from data_chain"
-      #  gcurs.execute( qry_SQL )
-      #  row_count = gcurs.fetchone()[0]
-        
-      #except Exception, E:
-      #  print(str(E))
-      #  sys.exit(-1)
-      ##---------------------------------------------------
+      # if data_chain has no data, fetch and insert block 1, since blockchain index starts there. otherwise fetch and insert max block + 1.
       try:
         qry_SQL = "SELECT max(blockheight) from data_chain"
         gcurs.execute( qry_SQL )
 
-        # safety check
+
         res_qry = gcurs.fetchone()
         if res_qry[0] is not None:
-          highest_block_in_pgdb = int(res_qry[0])
           lowest_block_not_in_pgdb = int(res_qry[0]) + 1
         else:
           lowest_block_not_in_pgdb = 1
@@ -647,8 +634,6 @@ def do_main_loop():
 
       if _verbose:
         print('do_main_loop- lowest_block_not_in_pgdb: '+str(lowest_block_not_in_pgdb))
-        #print('              data_chain rows: '+str(row_count))
-
       INSERT_block_to_pgdb( lowest_block_not_in_pgdb )
 
     ## done
