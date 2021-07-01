@@ -513,13 +513,13 @@ def INSERT_block_to_pgdb( in_row_cnt, in_blockheight ):
 
     ## ask for a new BLOCK row
     ##   if none, sleep and return
-    block_bits_row = get_block_bits_row( in_row_cnt+1 )
+    block_bits_row = get_block_bits_row( in_row_cnt )
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
         time.sleep(10)
         return   #  no new block; nothing to do
 
-    block_stats_row = get_block_stats_row( in_row_cnt+1 )
+    block_stats_row = get_block_stats_row( in_row_cnt )
 
     ##--- A new BLOCK is available  ------------------------------
 
@@ -652,7 +652,7 @@ def do_main_loop():
         print('do_main_loop- highest_block_in_pgdb: '+str(highest_block_in_pgdb))
         print('              data_chain rows: '+str(row_count))
 
-      INSERT_block_to_pgdb( row_count, highest_block_in_pgdb )
+      INSERT_block_to_pgdb( row_count +1, highest_block_in_pgdb )
 
     ## done
     return
