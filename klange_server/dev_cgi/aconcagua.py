@@ -102,7 +102,7 @@ def do_form():
   ua_str = os.getenv('HTTP_USER_AGENT')
   tStr = "IP {};<br>HTTP_USER_AGENT {}; ".format( ra_str, ua_str )
   print( "<pre>"+tStr+"</pre>")
-  print( "<pre>"+str(tD)+"</pre>" )
+  #print( "<pre>"+str(tD)+"</pre>" )
 
   print( form_Trailer )
 
@@ -164,12 +164,12 @@ if ( not os.path.isfile( '/tmp/'+dst_file) ):
     sys.exit(-1)
 
   tSQL_pre = '''  COPY
-  (SELECT calculate_energy_price( a.blkheight, a.median_time, a.chain_reward, a.chainwork_hex,
-                     b.blkheight, b.median_time, b.chain_reward, b.chainwork_hex),
-                     b.blkheight, b.median_time
+  (SELECT calculate_energy_price( a.blockheight, a.median_time, a.chain_reward, a.chainwork_hex,
+                     b.blockheight, b.median_time, b.chain_reward, b.chainwork_hex),
+                     b.blockheight, b.median_time
   FROM data_chain as a, data_chain as b  WHERE
-    a.blkheight > %s AND a.blkheight %% %s = 0  AND  a.blkheight < %s AND
-    b.blkheight = (a.blkheight+%s)  AND b.median_time <> a.median_time ) to
+    a.blockheight > %s AND a.blockheight %% %s = 0  AND  a.blockheight < %s AND
+    b.blockheight = (a.blockheight+%s)  AND b.median_time <> a.median_time ) to
 
   '''
   tSQL_post = '''
@@ -223,9 +223,9 @@ if tD.get('makeChartname') is not None:
     price_ax = plt.subplot(2,1,1)
 
     if tD.get('linearY') is not None:
-      price_ax.plot( df_ex0.blkheight, df_ex0.calcops_28)
+      price_ax.plot( df_ex0.blockheight, df_ex0.calculate_energy_price)
     else:
-      price_ax.semilogy( df_ex0.blkheight, df_ex0.calcops_28)
+      price_ax.semilogy( df_ex0.blockheight, df_ex0.calculate_energy_price)
 
     price_ax.grid(True)
 
