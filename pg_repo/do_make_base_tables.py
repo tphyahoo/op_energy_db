@@ -459,10 +459,10 @@ def INSERT_block_to_pgdb( lowest_block_not_in_pgdb ):
     ##  $HEIGHT is one or greater, ERROR otherwise
 
     ##=======================================================
-    ## MONDAY hack -----
 
     ## ask for a new BLOCK row
     ##   if none, sleep and return
+    # todo it shouldn't be sleep and return. it should keep trying forever. ditto foget_block_stats_row.
     block_bits_row = get_block_bits_row( lowest_block_not_in_pgdb )
     if block_bits_row is None or block_bits_row == '':
         if _verbose: print('DEBUG loop - nothing to do')
@@ -545,8 +545,6 @@ def INSERT_block_to_pgdb( lowest_block_not_in_pgdb ):
       gconn.commit()
     except Exception, E:
       print(str(E))
-
-    ##------------------ end MONDAY hack
 
     ##------------------------
     if _verbose: print('DEBUG  loop - returns')
