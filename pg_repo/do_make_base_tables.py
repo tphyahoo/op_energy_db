@@ -550,6 +550,43 @@ def INSERT_block_to_pgdb( lowest_block_not_in_pgdb ):
     if _verbose: print('DEBUG  loop - returns')
     return
 
+def get_accum_data_chain():
+    try:
+        qry_SQL = "SELECT max(blockheight) from data_chain"
+        gcurs.execute( qry_SQL )
+
+        res_qry = gcurs.fetchone()
+        # if data_chain has data
+        if res_qry[0] is not None:
+          highest_row_in_pgdb = int(res_qry[0])
+          lowest_block_not_in_pgdb = highest_row_in_pgdb + 1
+          ##  get accumulator variables from last recorded data_chain row
+          get_datachain_row_SQL = '''
+          SELECT chain_totalfee, chain_subsidy
+          FROM   public.data_chain
+          WHERE  blockheight = %s
+          '''
+
+          try:
+            gcurs.execute( get_datachain_row_SQL, (highest_row_in_pgdb, ) )
+            res_qry_accum = gcurs.fetchone()
+
+            if _verbose: print( 'res_qry_accum:  '+str(res_qry_accum))
+            accum_chainfee = res_qry_accum[0]
+            accum_chainsubsidy = res_qry_accum[1]
+          except Exception, E:
+            print("get_datachain_row_SQL: " + str(E) )
+
+        else:
+          # if data_chain has no data
+          lowest_block_not_in_pgdb = 0
+          accum_chainfee     = 0L
+          accum_chainsubsidy = 0L
+    except Exception, E:
+        print("qry_sql: " + str(E))
+        sys.exit(-1)
+    return {"lowest_block_not_in_pgdb" : lowest_block_not_in_pgdb, "accum_chainfee" : accum_chainfee, "accum_chainsubsidy" : accum_chainsubsidy }
+
 ##----------------------------------------------------------------
 def do_main_loop():
     global _verbose 
@@ -570,6 +607,9 @@ def do_main_loop():
         print(str(E))
         sys.exit(-1)
 
+
+      z = get_accum_data_chain()
+      print "z: " + str(z)
       if _verbose:
         print('do_main_loop- lowest_block_not_in_pgdb: '+str(lowest_block_not_in_pgdb))
       INSERT_block_to_pgdb( lowest_block_not_in_pgdb )
