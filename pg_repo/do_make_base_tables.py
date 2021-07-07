@@ -437,26 +437,10 @@ def get_block_stats_row( in_row ):
 
 
 ##----------------------------------------
-def INSERT_block_to_pgdb( lowest_block_not_in_pgdb ):
+def INSERT_block_to_pgdb( lowest_block_not_in_pgdb, accum_chainsubsidy, accum_chainfee ):
     global gcurs, gconn
     global g_bits_rows, g_stats_rows
     global _verbose #, g_height_imported
-
-    ##  TEST current $HEIGHT up to date?
-    ##
-    ##  -- ask for $HEIGHT+1
-    ##  --   if EMPTY return
-    ##         if text file
-    ##              extract rows for $HEIGHT+1 from textfile
-    ##
-    ##  --     else blockchain, look for that block+1, with 100 confirmations.
-    ##            (for both scripts) (stats and bits)
-    ##
-    ##  -- INSERT data
-    ##        insert row into raw tables (for sanity / logging)
-    ##
-    ##---------------------------------------------
-    ##  $HEIGHT is one or greater, ERROR otherwise
 
     ##=======================================================
 
@@ -473,46 +457,17 @@ def INSERT_block_to_pgdb( lowest_block_not_in_pgdb ):
 
     ##--- A new BLOCK is available  ------------------------------
 
-    ## explicit initialization to ensure variable type long integer
-    local_chainreward  = 0L
-    local_chainfee     = 0L
-    local_chainsubsidy = 0L
-
-    ##  get accumulator variables from last recorded data_chain row
-    get_datachain_row_SQL = '''
-      SELECT   chain_reward, chain_totalfee, chain_subsidy
-        FROM   public.data_chain
-       WHERE   blockheight = %s
-    '''
-    try:
-      gcurs.execute( get_datachain_row_SQL, (lowest_block_not_in_pgdb -1,) )
-      res_qry = gcurs.fetchone()
-      if _verbose: print( 'DEBUG get_datachain_row_SQL = ' )
-      if _verbose: print( '  '+str(res_qry)+';')
-    except Exception, E:
-      print(str(E))
-
-    ## use the data_chain row as the source for accumulated values
-    ##  only the first row will not have a data_chain entry yet
-    #if res_qry is None:
-    #  local_chainreward  = 5000000000L
-    #  local_chainfee     = 0L
-    #  local_chainsubsidy = 5000000000L
-    #else:
-
-    local_chainreward  = long(res_qry[0])
-    local_chainfee     = long(res_qry[1])
-    local_chainsubsidy = long(res_qry[2])
-
     ## get fee info from in-memory list
     ## height, blockhash, subsidy, totalfee, time, mediantime
     fee     = long( block_stats_row[3])   # ln3_totalfee)
     subsidy = long( block_stats_row[2])   # ln2_subsidy)
 
-    local_chainreward  = local_chainreward + fee + subsidy
-    local_chainfee     = local_chainfee + fee
-    local_chainsubsidy = local_chainsubsidy + subsidy
+    #local_chainreward  = local_chainreward + fee + subsidy
+    local_chainfee     = accum_chainfee + fee # todo, don't mutate vars.
+    local_chainsubsidy = accum_chainsubsidy + subsidy
+    local_chainreward  = local_chainsubsidy + local_chainfee
 
+    
     if _verbose:
       print( '   aggregate totals:')
       print( '              fee '+str(type(fee))+' '+str(fee)  )
@@ -593,26 +548,9 @@ def do_main_loop():
 
     while True:
       # if data_chain has no data, fetch and insert block 1, since blockchain index starts there. otherwise fetch and insert max block + 1.
-      try:
-        qry_SQL = "SELECT max(blockheight) from data_chain"
-        gcurs.execute( qry_SQL )
-
-
-        res_qry = gcurs.fetchone()
-        if res_qry[0] is not None:
-          lowest_block_not_in_pgdb = int(res_qry[0]) + 1
-        else:
-          lowest_block_not_in_pgdb = 1
-      except Exception, E:
-        print(str(E))
-        sys.exit(-1)
-
-
       z = get_accum_data_chain()
       print "z: " + str(z)
-      if _verbose:
-        print('do_main_loop- lowest_block_not_in_pgdb: '+str(lowest_block_not_in_pgdb))
-      INSERT_block_to_pgdb( lowest_block_not_in_pgdb )
+      INSERT_block_to_pgdb( z["lowest_block_not_in_pgdb"], z["accum_chainsubsidy"], z["accum_chainfee"] )
     return
 
 
