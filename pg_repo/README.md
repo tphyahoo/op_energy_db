@@ -28,8 +28,9 @@ TBD includes additional historical data, automation of init
 
 for making thartman sudo
 
-$ sudo adduser thartman sudo
-$ sudo su postgres -c 'createdb thartman_op_energy_db'
-$  sudo su postgres -c 'pg_restore -d thartman_op_energy_db op_energy_db_v0-02.dump'
+    $ sudo adduser thartman sudo
+    $ sudo su postgres -c 'createdb thartman_op_energy_db'
+    $  sudo su postgres -c 'pg_restore -d thartman_op_energy_db op_energy_db_v0-02.dump'
+
 
 
