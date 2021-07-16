@@ -41,6 +41,6 @@ In this git repo, the directory `dev_cgi` includes html,
 cgi and other web assets. The install script copies assets
 into the new server layout, which is subject to change.
 
-Try this server @   http://dev.bergain.biz:7888/bin/aconcagua.py
+Try this server @   http://dev.op-energy.info:7888/bin/aconcagua.py
 
 
