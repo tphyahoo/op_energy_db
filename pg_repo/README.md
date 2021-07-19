@@ -60,7 +60,7 @@ postgres install setup NOTES
      sudo -u postgres psql -f /tmp/build_postgres.sql
 
      #add a DB called op_energy
-     export DBNAME=op_energy
+     export DBNAME=op_energy_db   ## note- match  PGDATABASE  install_from_blockchain.sh
      sudo -u postgres  createdb -E UTF8 ${DBNAME}
      sudo -u postrges  psql -d "${DBNAME}" -c 'VACUUM ANALYZE;'
      sudo -u postrges  psql -d "${DBNAME}" -c 'create extension plpython3u;'
