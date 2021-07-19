@@ -52,14 +52,17 @@ postgres install setup NOTES
 
      apt-get install --yes postgresql postgresql-all   ## use default version for OS 
 
+     export USER_NAME=opdev
+     ## note that DB user postgres is more powerful than superuser, in the postgres internal system
      service postgresql start
      sudo -u postgres createuser --superuser $USER_NAME
      echo "alter role \"${USER_NAME}\" with password 'password'" > /tmp/build_postgres.sql
      sudo -u postgres psql -f /tmp/build_postgres.sql
 
-     #add a gratuitous db called $USER_NAME to avoid psql inconveniences
-     sudo -u postrges  createdb -E UTF8 $USER_NAME
-     sudo -u postrges  psql -d "${USER_NAME}" -c 'VACUUM ANALYZE;'
-     sudo -u postrges  psql -d "${USER_NAME}" -c 'create extension plpython3u;'
+     #add a DB called op_energy
+     export DBNAME=op_energy
+     sudo -u postgres  createdb -E UTF8 ${DBNAME}
+     sudo -u postrges  psql -d "${DBNAME}" -c 'VACUUM ANALYZE;'
+     sudo -u postrges  psql -d "${DBNAME}" -c 'create extension plpython3u;'
 
      sudo echo 'host    all  '${USER_NAME}'    127.0.0.1/32  md5' >> /path/to/pg_hba.conf
