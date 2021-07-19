@@ -62,4 +62,4 @@ postgres install setup NOTES
      sudo -u "${USER_NAME}" psql -d "${USER_NAME}" -c 'VACUUM ANALYZE;'
      sudo -u "${USER_NAME}" psql -d "${USER_NAME}" -c 'create extension plpython3u;'
 
-
+     sudo echo 'host    all  '${USER_NAME}'    127.0.0.1/32  md5' >> /path/to/pg_hba.conf
