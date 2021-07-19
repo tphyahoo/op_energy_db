@@ -21,8 +21,6 @@ and python3.   Prerequisites  (will change)
     SRC_MD5SUM=$SRC_DATAFILE.md5sum
 
 
-
-
 --
 TBD includes additional historical data, automation of init
 
@@ -35,33 +33,33 @@ for making thartman sudo
     $ sudo su postgres -c 'pg_restore -d thartman_op_energy_db op_energy_db_v0-02.dump'
 
 
-
 postgres install setup NOTES
 
-# DB is created in the current locale, which was reset to "C". Put it
-#  back to UTF so the templates will be created using UTF8 encoding.
-unset LC_ALL
-update-locale LC_ALL=en_US.UTF-8
-export LC_NUMERIC="en_US.UTF-8"
-export LC_TIME="en_US.UTF-8"
-export LC_MONETARY="en_US.UTF-8"
-export LC_PAPER="en_US.UTF-8"
-export LC_NAME="en_US.UTF-8"
-export LC_ADDRESS="en_US.UTF-8"
-export LC_TELEPHONE="en_US.UTF-8"
-export LC_MEASUREMENT="en_US.UTF-8"
-export LC_IDENTIFICATION="en_US.UTF-8"
 
-apt-get install --yes postgresql postgresql-all   ## use default version for OS 
+     # DB is created in the current locale, which was reset to "C". Put it
+     #  back to UTF so the templates will be created using UTF8 encoding.
+     unset LC_ALL
+     update-locale LC_ALL=en_US.UTF-8
+     export LC_NUMERIC="en_US.UTF-8"
+     export LC_TIME="en_US.UTF-8"
+     export LC_MONETARY="en_US.UTF-8"
+     export LC_PAPER="en_US.UTF-8"
+     export LC_NAME="en_US.UTF-8"
+     export LC_ADDRESS="en_US.UTF-8"
+     export LC_TELEPHONE="en_US.UTF-8"
+     export LC_MEASUREMENT="en_US.UTF-8"
+     export LC_IDENTIFICATION="en_US.UTF-8"
 
-service postgresql start
-sudo -u postgres createuser --superuser $USER_NAME
-echo "alter role \"user\" with password 'user'" > /tmp/build_postgres.sql
-sudo -u postgres psql -f /tmp/build_postgres.sql
+     apt-get install --yes postgresql postgresql-all   ## use default version for OS 
 
-#add a gratuitous db called user to avoid psql inconveniences
-sudo -u $USER_NAME createdb -E UTF8 $USER_NAME
-sudo -u "$USER_NAME" psql -d "$USER_NAME" -c 'VACUUM ANALYZE;'
+     service postgresql start
+     sudo -u postgres createuser --superuser $USER_NAME
+     echo "alter role \"user\" with password 'user'" > /tmp/build_postgres.sql
+     sudo -u postgres psql -f /tmp/build_postgres.sql
+
+     #add a gratuitous db called user to avoid psql inconveniences
+     sudo -u $USER_NAME createdb -E UTF8 $USER_NAME
+     sudo -u "$USER_NAME" psql -d "$USER_NAME" -c 'VACUUM ANALYZE;'
 
 
 
