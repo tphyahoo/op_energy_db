@@ -60,6 +60,6 @@ postgres install setup NOTES
      #add a gratuitous db called user to avoid psql inconveniences
      sudo -u $USER_NAME createdb -E UTF8 $USER_NAME
      sudo -u "$USER_NAME" psql -d "$USER_NAME" -c 'VACUUM ANALYZE;'
-
+     sudo -u "$USER_NAME" psql -d "$USER_NAME" -c 'create extension plpython3u;'
 
 
