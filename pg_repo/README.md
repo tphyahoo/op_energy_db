@@ -54,12 +54,12 @@ postgres install setup NOTES
 
      service postgresql start
      sudo -u postgres createuser --superuser $USER_NAME
-     echo "alter role \"user\" with password 'user'" > /tmp/build_postgres.sql
+     echo "alter role \"${USER_NAME}\" with password 'user'" > /tmp/build_postgres.sql
      sudo -u postgres psql -f /tmp/build_postgres.sql
 
      #add a gratuitous db called user to avoid psql inconveniences
-     sudo -u $USER_NAME createdb -E UTF8 $USER_NAME
-     sudo -u "$USER_NAME" psql -d "$USER_NAME" -c 'VACUUM ANALYZE;'
-     sudo -u "$USER_NAME" psql -d "$USER_NAME" -c 'create extension plpython3u;'
+     sudo -u ${USER_NAME} createdb -E UTF8 $USER_NAME
+     sudo -u "${USER_NAME}" psql -d "${USER_NAME}" -c 'VACUUM ANALYZE;'
+     sudo -u "${USER_NAME}" psql -d "${USER_NAME}" -c 'create extension plpython3u;'
 
 
