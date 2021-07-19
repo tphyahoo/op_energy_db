@@ -58,8 +58,8 @@ postgres install setup NOTES
      sudo -u postgres psql -f /tmp/build_postgres.sql
 
      #add a gratuitous db called $USER_NAME to avoid psql inconveniences
-     sudo -u ${USER_NAME} createdb -E UTF8 $USER_NAME
-     sudo -u "${USER_NAME}" psql -d "${USER_NAME}" -c 'VACUUM ANALYZE;'
-     sudo -u "${USER_NAME}" psql -d "${USER_NAME}" -c 'create extension plpython3u;'
+     sudo -u postrges  createdb -E UTF8 $USER_NAME
+     sudo -u postrges  psql -d "${USER_NAME}" -c 'VACUUM ANALYZE;'
+     sudo -u postrges  psql -d "${USER_NAME}" -c 'create extension plpython3u;'
 
      sudo echo 'host    all  '${USER_NAME}'    127.0.0.1/32  md5' >> /path/to/pg_hba.conf
