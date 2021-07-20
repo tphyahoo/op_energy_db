@@ -60,9 +60,12 @@ postgres install setup NOTES
 
      export PGVERS=13
      export PGHBA=/etc/postgresql/${PGVERS}/main/pg_hba.conf
-     export TS='host    all  '${PGUSER_NAME}'    127.0.0.1/32  trust'
+     export TS='host    all  '${PGROLE}'    127.0.0.1/32  trust'
 
+     echo '' | sudo tee -a ${PGHBA}
+     echo '##------------------' | sudo tee -a ${PGHBA}
      echo $TS | sudo tee -a ${PGHBA}
+     echo '' | sudo tee -a ${PGHBA}
 
      ##--------------------------------------------------------
      sudo adduser --gecos "" --disabled-password ${NIXUSER}
