@@ -84,3 +84,13 @@ postgres install setup NOTES
      sudo -u postgres  psql -c 'alter database '$DBNAME' owner to '$PGROLE' '
      sudo -u postgres  psql -d ${DBNAME} -c 'create extension plpython3u;'
      sudo -u postgres  psql -d ${DBNAME} -c 'VACUUM ANALYZE;'
+
+
+This should result in DBNAME available to connect via psycopg2 
+
+     conn = psycopg2.connect( "dbname=op_energy_db user=pgopdev host=localhost password=pass" )
+     curs = conn.cursor()
+     res = curs.execute('select 1')
+     curs.fetchone()
+
+
