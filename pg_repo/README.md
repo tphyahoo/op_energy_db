@@ -15,10 +15,6 @@ and python3.   Prerequisites  (will change)
 * execute these driver scripts to build a minimal OP_ENERGY calculator
 
 
-     export SRC_DDIR=/var/local/opdev/
-     export SRC_DATAFILE=btcdata_1600585200.tgz
-     export SRC_MD5SUM=$SRC_DATAFILE.md5sum
-
      ./import_from_blockchain.sh
 
 
