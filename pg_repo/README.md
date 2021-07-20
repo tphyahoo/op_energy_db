@@ -54,8 +54,8 @@ postgres install setup NOTES
      sudo apt-get install --yes postgresql postgresql-all   ## use default version for OS 
  
      ##-------------------------------------------------
-     export PGUSER_NAME=pgopdev
-     export NIXUSER_NAME=opdev
+     export PGROLE=pgopdev
+     export NIXUSER=opdev
      export NIX_PASS=neveropdev
 
      export PGVERS=13
@@ -65,24 +65,25 @@ postgres install setup NOTES
      echo $TS | sudo tee -a ${PGHBA}
 
      ##--------------------------------------------------------
-     sudo adduser --gecos "" --disabled-password ${NIXUSER_NAME}
-     sudo chpasswd <<<"${NIXUSER_NAME}:${NIX_PASS}"
+     sudo adduser --gecos "" --disabled-password ${NIXUSER}
+     sudo chpasswd <<<"${NIXUSER}:${NIX_PASS}"
 
      sudo service postgresql start
 
+     ##--------------------------------------------------------
+     sudo adduser --gecos "" --disabled-password ${NIXUSER_NAME}
+     sudo chpasswd <<<"${NIXUSER_NAME}:${NIX_PASS}"
+
+     sudo service postgresql restart
+
      ## note that DB user postgres is more powerful than superuser, in the postgres internal system
-     ##  also note that a template1 with plpython3 can be copied, no superuser 
-     psql -c "create role ${PGUSER_NAME} with superuser createdb login password 'pass'"
+     ##  also note that a template1 with plpython3 can be copied instead 
+     psql -c "create role ${PGROLE} with superuser createdb login password 'pass'"
 
      ##-------------------------------------
      export DBNAME=op_energy_db   ## note- match  $PGDATABASE  install_from_blockchain.sh
 
-     sudo -u ${NIXUSER_NAME}  createdb -E UTF8 ${DBNAME}
-     sudo -u ${NIXUSER_NAME}  psql -d "${DBNAME}" -c 'create extension plpython3u;'
-     sudo -u ${NIXUSER_NAME}  psql -d "${DBNAME}" -c 'VACUUM ANALYZE;'
-
-
-     ##----------------------------------------------------
-     ##--sudo -u postgres createuser --superuser $USER_NAME
-     ##--echo "alter role \"${USER_NAME}\" with password 'password'" > /tmp/build_postgres.sql
-     ##--sudo -u postgres psql -f /tmp/build_postgres.sql
+     sudo -u postgres  createdb -E UTF8 ${DBNAME}
+     sudo -u postgres  psql -c 'alter database '$DBNAME' owner to '$PGROLE' '
+     sudo -u postgres  psql -d ${DBNAME} -c 'create extension plpython3u;'
+     sudo -u postgres  psql -d ${DBNAME} -c 'VACUUM ANALYZE;'
