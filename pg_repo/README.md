@@ -14,10 +14,11 @@ and python3.   Prerequisites  (will change)
 
       export SRC_DDIR=/var/local/opdev/  
 
-* execute these driver scripts to build a minimal OP_ENERGY calculator
+* execute a non-privelaged driver script to build a minimal OP_ENERGY calculator
 
       ./import_from_blockchain.sh
 
+`TBD` pass PGROLE and NIXUSER as env vars
 `TBD` add additional historical data, better automation of init  
 `TBD` modify postgresql.conf to enable connection logging
 
