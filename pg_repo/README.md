@@ -18,9 +18,9 @@ and python3.   Prerequisites  (will change)
 
       ./import_from_blockchain.sh
 
-`TBD` pass PGROLE and NIXUSER as env vars
-`TBD` add additional historical data, better automation of init  
-`TBD` modify postgresql.conf to enable connection logging
+`TODO` pass PGROLE and NIXUSER as env vars
+`TODO` add additional historical data, better automation of init  
+`TODO` modify postgresql.conf to enable connection logging
 
 
 ### Create Test Db, Restore from backup ###
@@ -59,11 +59,12 @@ Debian/Ubuntu bash --  add linux user thartman to group sudo
 
      export PGVERS=13
      export PGHBA=/etc/postgresql/${PGVERS}/main/pg_hba.conf
-     export TS="host     all    ${PGROLE}      127.0.0.1/32   trust"
-
+     export HBAPERMSTR="host     all    ${PGROLE}      127.0.0.1/32   trust"
+     ## append one rule string+comment lines, to pg_hba.conf  
+     ##  TODO insert earlier in the pg_hba.conf order of rules, last is less useful
      echo '' | sudo tee -a ${PGHBA}
      echo '##------------------' | sudo tee -a ${PGHBA}
-     echo $TS | sudo tee -a ${PGHBA}
+     echo $HBAPERMSTR | sudo tee -a ${PGHBA}
      echo '' | sudo tee -a ${PGHBA}
 
      ##--------------------------------------------------------
