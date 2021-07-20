@@ -18,8 +18,8 @@ and python3.   Prerequisites  (will change)
      ./import_from_blockchain.sh
 
 
---
-TBD includes additional historical data, automation of init
+`TBD` add additional historical data, better automation of init
+
 
 ### Create Test Db, Restore from backup ###
 
@@ -57,7 +57,7 @@ Debian/Ubuntu bash --  add linux user thartman to group sudo
 
      export PGVERS=13
      export PGHBA=/etc/postgresql/${PGVERS}/main/pg_hba.conf
-     export TS='host    all  '${PGROLE}'    127.0.0.1/32  trust'
+     export TS="host     all    ${PGROLE}      127.0.0.1/32   trust"
 
      echo '' | sudo tee -a ${PGHBA}
      echo '##------------------' | sudo tee -a ${PGHBA}
