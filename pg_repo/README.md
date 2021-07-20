@@ -36,7 +36,9 @@ for making thartman sudo
 postgres install setup NOTES
 
 
-     # DB is created in the current locale, which was reset to "C". Put it
+
+     # OPTIONAL encoding setup for sorting order and string formatting
+     # DB is created in the current locale, which might be reset to "C". Put it
      #  back to UTF so the templates will be created using UTF8 encoding.
      unset LC_ALL
      update-locale LC_ALL=en_US.UTF-8
@@ -50,19 +52,36 @@ postgres install setup NOTES
      export LC_MEASUREMENT="en_US.UTF-8"
      export LC_IDENTIFICATION="en_US.UTF-8"
 
-     apt-get install --yes postgresql postgresql-all   ## use default version for OS 
+     sudo apt-get install --yes postgresql postgresql-all   ## use default version for OS 
+     ##-------------------------------------------------
+     export PGUSER_NAME=pgopdev
+     export NIXUSER_NAME=opdev
+     export NIX_PASS=neveropdev
 
-     export USER_NAME=opdev
-     ## note that DB user postgres is more powerful than superuser, in the postgres internal system
+     export PGVERS=13
+     export PGHBA=/etc/postgresql/${PGVERS}/main/pg_hba.conf
+
+     sudo echo 'host    all  '${USER_NAME}'    127.0.0.1/32  trust' >> ${PGHBA}
+
+     ##--------------------------------------------------------
+
+     adduser --gecos "" --disabled-password ${NIXUSER_NAME}
+     chpasswd <<<"${NIXUSER_NAME}:${NIX_PASS}"
+
      service postgresql start
-     sudo -u postgres createuser --superuser $USER_NAME
-     echo "alter role \"${USER_NAME}\" with password 'password'" > /tmp/build_postgres.sql
-     sudo -u postgres psql -f /tmp/build_postgres.sql
 
-     #add a DB called op_energy
+     ##--sudo -u postgres createuser --superuser $USER_NAME
+     ##--echo "alter role \"${USER_NAME}\" with password 'password'" > /tmp/build_postgres.sql
+     ##--sudo -u postgres psql -f /tmp/build_postgres.sql
+
+     ## note that DB user postgres is more powerful than superuser, in the postgres internal system
+     ##  also note that a template1 with plpython3 can be copied, no superuser 
+     psql -c "create role ${PGUSER_NAME} with superuser createdb login password 'pass'"
+
+     ##-------------------------------------
      export DBNAME=op_energy_db   ## note- match  PGDATABASE  install_from_blockchain.sh
-     sudo -u postgres  createdb -E UTF8 ${DBNAME}
-     sudo -u postrges  psql -d "${DBNAME}" -c 'VACUUM ANALYZE;'
-     sudo -u postrges  psql -d "${DBNAME}" -c 'create extension plpython3u;'
 
-     sudo echo 'host    all  '${USER_NAME}'    127.0.0.1/32  md5' >> /path/to/pg_hba.conf
+     sudo -u ${NIXUSER_NAME}  createdb -E UTF8 ${DBNAME}
+     sudo -u ${NIXUSER_NAME}  psql -d "${DBNAME}" -c 'create extension plpython3u;'
+     sudo -u ${NIXUSER_NAME}  psql -d "${DBNAME}" -c 'VACUUM ANALYZE;'
+
