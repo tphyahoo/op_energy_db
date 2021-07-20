@@ -65,17 +65,17 @@ postgres install setup NOTES
      echo $TS | sudo tee -a ${PGHBA}
 
      ##--------------------------------------------------------
-     adduser --gecos "" --disabled-password ${NIXUSER_NAME}
-     chpasswd <<<"${NIXUSER_NAME}:${NIX_PASS}"
+     sudo adduser --gecos "" --disabled-password ${NIXUSER_NAME}
+     sudo chpasswd <<<"${NIXUSER_NAME}:${NIX_PASS}"
 
-     service postgresql start
+     sudo service postgresql start
 
      ## note that DB user postgres is more powerful than superuser, in the postgres internal system
      ##  also note that a template1 with plpython3 can be copied, no superuser 
      psql -c "create role ${PGUSER_NAME} with superuser createdb login password 'pass'"
 
      ##-------------------------------------
-     export DBNAME=op_energy_db   ## note- match  PGDATABASE  install_from_blockchain.sh
+     export DBNAME=op_energy_db   ## note- match  $PGDATABASE  install_from_blockchain.sh
 
      sudo -u ${NIXUSER_NAME}  createdb -E UTF8 ${DBNAME}
      sudo -u ${NIXUSER_NAME}  psql -d "${DBNAME}" -c 'create extension plpython3u;'
