@@ -71,8 +71,8 @@ postgres install setup NOTES
      sudo service postgresql start
 
      ##--------------------------------------------------------
-     sudo adduser --gecos "" --disabled-password ${NIXUSER_NAME}
-     sudo chpasswd <<<"${NIXUSER_NAME}:${NIX_PASS}"
+     sudo adduser --gecos "" --disabled-password ${NIXUSER}
+     sudo chpasswd <<<"${NIXUSER}:${NIX_PASS}"
 
      sudo service postgresql restart
 
