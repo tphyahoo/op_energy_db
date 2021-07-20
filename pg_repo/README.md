@@ -5,35 +5,36 @@ and python3.   Prerequisites  (will change)
 
 * Postgresql installed on a suitable host *nix, prefer v12+
 
-* SETUP:  Linux user opdev;  Postgresql role opdev 
+* SETUP:  Linux user opdev;  Postgresql role opdev  (below) 
 
 * Regenerate data from base block using a live node OR
    use a data file seed -> filename btcdata_0000000000.tgz where 00 is unixtime
 
-* data dir contains data file and checksum  
+* data dir/ contains a data file and a checksum file  
 
 * execute these driver scripts to build a minimal OP_ENERGY calculator
 
-    import_from_blockchain.sh
 
-    SRC_DDIR=/var/local/opdev/
-    SRC_DATAFILE=btcdata_1600585200.tgz
-    SRC_MD5SUM=$SRC_DATAFILE.md5sum
+    export SRC_DDIR=/var/local/opdev/
+    export SRC_DATAFILE=btcdata_1600585200.tgz
+    export SRC_MD5SUM=$SRC_DATAFILE.md5sum
+
+    ./import_from_blockchain.sh
 
 
 --
 TBD includes additional historical data, automation of init
 
-## Create Test Db, Restore from backup ##
+### Create Test Db, Restore from backup ###
 
-for making thartman sudo
+Debian/Ubuntu bash --  add linux user thartman to group sudo
 
     $ sudo adduser thartman sudo
     $ sudo su postgres -c 'createdb thartman_op_energy_db'
     $ sudo su postgres -c 'pg_restore -d thartman_op_energy_db op_energy_db_v0-02.dump'
 
 
-postgres install setup NOTES
+### Postgres install setup ###
 
 
      # OPTIONAL encoding setup for sorting order and string formatting
@@ -86,7 +87,9 @@ postgres install setup NOTES
      sudo -u postgres  psql -d ${DBNAME} -c 'VACUUM ANALYZE;'
 
 
-This should result in DBNAME available to connect via psycopg2 
+DBNAME is now available to connect via python psycopg2 
+
+     import psycopg2
 
      conn = psycopg2.connect( "dbname=op_energy_db user=pgopdev host=localhost password=pass" )
      curs = conn.cursor()
