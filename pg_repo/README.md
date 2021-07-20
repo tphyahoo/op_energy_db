@@ -3,22 +3,21 @@
 This setup builds an analytics environment in PostgreSQL
 and python3.   Prerequisites  (will change)
 
-* Postgresql installed on a suitable host *nix, prefer v12+
+* Postgres installed on a suitable host *nix, prefer pg vers 12+
 
-* SETUP:  Linux user opdev;  Postgresql role opdev  (below) 
+* `SETUP` linux user  $NIXUSER;  postgres role  $PGROLE   (below) 
 
-* Regenerate data from base block using a live node OR
-   use a data file seed -> filename btcdata_0000000000.tgz where 00 is unixtime
+* Regenerate chain data from base block using a live node feed  OR
+   read a seed data file -> btcdata_0000000000.tgz   where 00 is unixtime
 
-* data dir/ contains a data file and a checksum file  
+* data_dir/ contains a data file and a checksum file  
 
 * execute these driver scripts to build a minimal OP_ENERGY calculator
 
-
      ./import_from_blockchain.sh
 
-
 `TBD` add additional historical data, better automation of init
+`TBD` modify postgresql.conf to enable connection logging
 
 
 ### Create Test Db, Restore from backup ###
