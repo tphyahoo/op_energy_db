@@ -30,6 +30,7 @@ Debian/Ubuntu bash --  add linux user thartman to group sudo
     $ sudo adduser thartman sudo
     $ sudo su postgres -c 'createdb thartman_op_energy_db'
     $ sudo su postgres -c 'pg_restore -d thartman_op_energy_db op_energy_db_v0-02.dump'
+    TODO explicit setting of roles / privs in the restored DB; roles are PG globals
 
 
 ### Postgres install setup for Debian/Ubuntu OS ###
