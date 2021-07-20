@@ -32,7 +32,7 @@ Debian/Ubuntu bash --  add linux user thartman to group sudo
     $ sudo su postgres -c 'pg_restore -d thartman_op_energy_db op_energy_db_v0-02.dump'
 
 
-### Postgres install setup ###
+### Postgres install setup for Debian/Ubuntu OS ###
 
 
      # OPTIONAL encoding setup for sorting order and string formatting
