@@ -36,7 +36,6 @@ for making thartman sudo
 postgres install setup NOTES
 
 
-
      # OPTIONAL encoding setup for sorting order and string formatting
      # DB is created in the current locale, which might be reset to "C". Put it
      #  back to UTF so the templates will be created using UTF8 encoding.
@@ -53,6 +52,7 @@ postgres install setup NOTES
      export LC_IDENTIFICATION="en_US.UTF-8"
 
      sudo apt-get install --yes postgresql postgresql-all   ## use default version for OS 
+ 
      ##-------------------------------------------------
      export PGUSER_NAME=pgopdev
      export NIXUSER_NAME=opdev
@@ -60,19 +60,15 @@ postgres install setup NOTES
 
      export PGVERS=13
      export PGHBA=/etc/postgresql/${PGVERS}/main/pg_hba.conf
+     export TS='host    all  '${PGUSER_NAME}'    127.0.0.1/32  trust'
 
-     sudo echo 'host    all  '${USER_NAME}'    127.0.0.1/32  trust' >> ${PGHBA}
+     echo $TS | sudo tee -a ${PGHBA}
 
      ##--------------------------------------------------------
-
      adduser --gecos "" --disabled-password ${NIXUSER_NAME}
      chpasswd <<<"${NIXUSER_NAME}:${NIX_PASS}"
 
      service postgresql start
-
-     ##--sudo -u postgres createuser --superuser $USER_NAME
-     ##--echo "alter role \"${USER_NAME}\" with password 'password'" > /tmp/build_postgres.sql
-     ##--sudo -u postgres psql -f /tmp/build_postgres.sql
 
      ## note that DB user postgres is more powerful than superuser, in the postgres internal system
      ##  also note that a template1 with plpython3 can be copied, no superuser 
@@ -85,3 +81,8 @@ postgres install setup NOTES
      sudo -u ${NIXUSER_NAME}  psql -d "${DBNAME}" -c 'create extension plpython3u;'
      sudo -u ${NIXUSER_NAME}  psql -d "${DBNAME}" -c 'VACUUM ANALYZE;'
 
+
+     ##----------------------------------------------------
+     ##--sudo -u postgres createuser --superuser $USER_NAME
+     ##--echo "alter role \"${USER_NAME}\" with password 'password'" > /tmp/build_postgres.sql
+     ##--sudo -u postgres psql -f /tmp/build_postgres.sql
