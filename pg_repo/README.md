@@ -74,7 +74,9 @@ Debian/Ubuntu bash --  add linux user thartman to group sudo
      sudo service postgresql restart
 
      ## note that DB user postgres is more powerful than superuser, in the postgres internal system
-     ##  also note that a template1 with plpython3 can be copied instead 
+     ##  note that there is an alternate method that does not require superuser for the pg client role
+     ##   a template1 database could be available that includes plpython3u, then that template1 can be copied 
+     
      psql -c "create role ${PGROLE} with superuser createdb login password 'pass'"
 
      ##-------------------------------------
