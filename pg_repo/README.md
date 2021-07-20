@@ -71,12 +71,6 @@ postgres install setup NOTES
      sudo adduser --gecos "" --disabled-password ${NIXUSER}
      sudo chpasswd <<<"${NIXUSER}:${NIX_PASS}"
 
-     sudo service postgresql start
-
-     ##--------------------------------------------------------
-     sudo adduser --gecos "" --disabled-password ${NIXUSER}
-     sudo chpasswd <<<"${NIXUSER}:${NIX_PASS}"
-
      sudo service postgresql restart
 
      ## note that DB user postgres is more powerful than superuser, in the postgres internal system
