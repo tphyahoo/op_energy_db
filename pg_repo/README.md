@@ -10,13 +10,15 @@ and python3.   Prerequisites  (will change)
 * Regenerate chain data from base block using a live node feed  OR
    read a seed data file -> btcdata_0000000000.tgz   where 00 is unixtime
 
-* data_dir/ contains a data file and a checksum file  
+* data_dir/ contains a data file and a checksum file;  
+
+      export SRC_DDIR=/var/local/opdev/  
 
 * execute these driver scripts to build a minimal OP_ENERGY calculator
 
-     ./import_from_blockchain.sh
+      ./import_from_blockchain.sh
 
-`TBD` add additional historical data, better automation of init
+`TBD` add additional historical data, better automation of init  
 `TBD` modify postgresql.conf to enable connection logging
 
 
